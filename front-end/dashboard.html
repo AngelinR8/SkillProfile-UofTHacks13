@@ -56,6 +56,18 @@
         background-color: #666;
         color: white;
       }
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .container div {
+        background-color: white;
+        border: 1px solid black;
+        padding: 10px;
+        font-size: 30px;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
@@ -70,8 +82,18 @@
       <a href="#interview_prep">Interview Prep</a>
     </div>
     <div class="container">
-      <h2>Welcome</h2>
-      <p>This is your dashboard starter page.</p>
+      <div class="welcome">
+        <h2>&#128075; Welcome back Alex!</h2>
+        <p>Computer Science Student at University of Toronto</p>
+        <p>Last Updated: 2 days ago</p>
+      </div>
+      <div class="stats">
+        <h2>Quick Stats</h2>
+        <p>&#128241; Social posts: 12</p>
+        <p>&#128195; Resumes: 5</p>
+        <p>&#128188; Interview Preps: 3</p>
+        <p>&#10024; Profile strength: 85%</p>
+      </div>
     </div>
   </body>
 </html>
