@@ -70,7 +70,7 @@
         align-items: center;
       }
 
-      /* SHARED CARD STYLING (MIMICKING PROFILE) */
+      /* SHARED CARD STYLING */
       .info-card {
         background: white;
         border: 1px solid black;
@@ -95,7 +95,7 @@
         padding: 30px 40px;
       }
 
-      /* SOLID BLACK BUTTONS */
+      /* BUTTONS */
       button {
         background-color: #333;
         color: white;
@@ -112,16 +112,36 @@
         background-color: #555;
       }
 
-      /* VAULT SPECIFIC LAYOUT */
-      .vault-stats {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+      .btn-outline {
+        background: none;
+        color: black;
+        border: 1px solid black;
+        padding: 4px 8px;
+        margin-left: 5px;
       }
 
-      .stat-item {
-        font-size: 16px;
-        line-height: 1.6;
+      /* ENTRY BOX STYLING */
+      .vault-entry {
+        border: 1px solid black;
+        padding: 20px;
+        margin-bottom: 15px;
+      }
+
+      .action-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .vault-grid {
+        text-align: left;
+        font-size: 14px;
+        margin-top: 15px;
+      }
+
+      .vault-grid p {
+        margin-bottom: 5px;
       }
 
       .center-wrap {
@@ -137,6 +157,21 @@
         text-align: left;
         width: 100%;
         max-width: 900px;
+      }
+
+      ul {
+        padding-left: 20px;
+        line-height: 1.6;
+        margin-top: 10px;
+      }
+
+      .empty-placeholder {
+        border: 1px dashed #ccc;
+        color: #999;
+        text-align: center;
+        padding: 20px;
+        margin-bottom: 15px;
+        font-style: italic;
       }
     </style>
   </head>
@@ -169,10 +204,137 @@
           <button>Add New Item</button>
         </div>
         <div class="info-body">
-          <div class="vault-stats">
-              <p><strong>Total Items:</strong> 25</p>
-              <p>🎓 Degrees: 1  💼 Jobs: 3  🚀 Projects: 5</p>
-              <p>🛠️ Skills: 12  🏆 Awards: 4</p>
+          <div style="text-align: center">
+            <p style="margin-bottom: 10px">25 items total</p>
+            <div class="vault-grid">
+              <p>🎓 1 Degree</p>
+              <p>💼 3 Jobs</p>
+              <p>🚀 5 Projects</p>
+              <p>🛠️ 12 Skills</p>
+              <p>🏆 4 Awards</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-header">
+          <span>🎓 DEGREES (1)</span>
+          <button>+ Add Degree</button>
+        </div>
+        <div class="info-body">
+          <div class="vault-entry">
+            <p style="font-weight: bold; font-size: 1.1em">
+              Honours BSc in Computer Science & Statistics
+            </p>
+            <p>University of Toronto</p>
+            <p style="color: #666">Sep 2024 - Present | GPA: 3.9</p>
+            <ul>
+              <li>
+                Strong foundation in linear algebra, probability, and
+                algorithmic thinking for ML
+              </li>
+              <li>
+                High academic standing in mathematically intensive program
+              </li>
+            </ul>
+            <div class="action-row">
+              <button class="btn-outline">✏️ Edit</button>
+              <button class="btn-outline">🗑️ Delete</button>
+              <button class="btn-outline">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-header">
+          <span>💼 JOBS (3)</span>
+          <button>+ Add Job</button>
+        </div>
+        <div class="info-body">
+          <div class="vault-entry">
+            <p style="font-weight: bold; font-size: 1.1em">
+              Software Engineering Intern
+            </p>
+            <p>Tech Corp Solutions</p>
+            <p style="color: #666">May 2025 - Aug 2025</p>
+            <ul>
+              <li>Developed internal dashboards using React and Node.js</li>
+              <li>Optimized SQL queries reducing latency by 20%</li>
+            </ul>
+            <div class="action-row">
+              <button class="btn-outline">✏️ Edit</button>
+              <button class="btn-outline">🗑️ Delete</button>
+              <button class="btn-outline">📋 Copy</button>
+            </div>
+          </div>
+          <div class="empty-placeholder">
+            Job Slot #2 - Click "Add Job" to fill
+          </div>
+          <div class="empty-placeholder">
+            Job Slot #3 - Click "Add Job" to fill
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-header">
+          <span>🚀 PROJECTS (5)</span>
+          <button>+ Add Project</button>
+        </div>
+        <div class="info-body">
+          <div class="vault-entry">
+            <p style="font-weight: bold; font-size: 1.1em">OneProfile</p>
+            <p>Full-Stack Identity Management System</p>
+            <ul>
+              <li>
+                Built centralized professional identity vault with dynamic UI
+                components
+              </li>
+              <li>Integrated local persistence for user data management</li>
+            </ul>
+            <div class="action-row">
+              <button class="btn-outline">✏️ Edit</button>
+              <button class="btn-outline">🗑️ Delete</button>
+              <button class="btn-outline">📋 Copy</button>
+            </div>
+          </div>
+          <div class="empty-placeholder">Project Slot #2</div>
+          <div class="empty-placeholder">Project Slot #3</div>
+          <div class="empty-placeholder">Project Slot #4</div>
+          <div class="empty-placeholder">Project Slot #5</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-header">
+          <span>🛠️ SKILLS (12)</span>
+          <button>+ Add Skill</button>
+        </div>
+        <div class="info-body">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <p><strong>Technical:</strong></p>
+              <ul>
+                <li>JavaScript</li>
+                <li>Python</li>
+                <li>C++</li>
+                <li>SQL</li>
+                <li>Java</li>
+                <li>HTML/CSS</li>
+              </ul>
+            </div>
+            <div>
+              <p><strong>DevOps & Tools:</strong></p>
+              <ul>
+                <li>React</li>
+                <li>Node.js</li>
+                <li>Git</li>
+                <li>Docker</li>
+                <li>AWS</li>
+                <li>Linux</li>
+              </ul>
             </div>
           </div>
         </div>
