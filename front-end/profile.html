@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile - OneProfile</title>
-    <script src="script.js"></script>
     <style>
       * {
         margin: 0;
@@ -15,13 +14,15 @@
       body {
         font-family: Arial, sans-serif;
         background-color: #f5f5f5;
+        padding-bottom: 40px;
       }
 
-      /* HEADER */
+      /* HEADER / TOP BAR */
       header {
         background-color: #333;
         color: white;
         padding: 20px;
+        width: 100%;
       }
 
       .header-content {
@@ -46,68 +47,27 @@
         gap: 20px;
       }
 
-      .profile {
+      .profile-nav {
         display: flex;
         align-items: center;
         gap: 10px;
       }
 
       .profile-picture {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-      }
-
-      /* NOTIFICATIONS */
-      .notification-dropdown {
-        position: relative;
-      }
-
-      .notification-btn {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 24px;
-        cursor: pointer;
-      }
-
-      .notification-menu {
-        display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        min-width: 250px;
-        z-index: 1000;
-        margin-top: 8px;
-      }
-
-      .notification-btn:hover + .notification-menu,
-      .notification-menu:hover {
-        display: block;
-      }
-
-      /* MAIN CONTAINER */
-      .container {
-        max-width: 1200px;
-        margin: 40px auto;
-        padding: 0 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 30px;
+        background-color: #eee;
       }
 
       /* SHARED CARD STYLING */
       .info-card {
         background: white;
-        border: 1px solid #999;
+        border: 1px solid black;
         font-family: "Courier New", Courier, monospace;
         width: 100%;
         max-width: 900px;
+        margin: 20px auto;
         box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
       }
 
@@ -116,7 +76,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 12px 20px;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid black;
         font-size: 14px;
         font-weight: bold;
       }
@@ -127,21 +87,32 @@
         gap: 50px;
       }
 
-      /* UPDATED BUTTON STYLING */
-      .action-btn {
+      /* GLOBAL SOLID BUTTON STYLING */
+      button {
         background-color: #333;
         color: white;
         border: none;
-        padding: 8px 16px;
+        padding: 8px 14px;
         border-radius: 4px;
+        cursor: pointer;
         font-family: inherit;
         font-size: 13px;
-        cursor: pointer;
         transition: background 0.2s;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
       }
 
-      .action-btn:hover {
+      button:hover {
         background-color: #555;
+      }
+
+      /* CENTER WRAP FIX */
+      .center-wrap {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
       }
 
       /* PHOTO SECTION */
@@ -153,59 +124,51 @@
       .photo-placeholder {
         width: 160px;
         height: 160px;
-        border: 1px dashed #333;
+        border: 1px solid black;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 15px;
+        margin-bottom: 5px;
         background-color: #fafafa;
       }
 
-      /* DETAILS & ABOUT SECTION */
-      .details-section {
-        flex: 1;
+      /* DETAILS SECTION */
+      .details-section { flex: 1; }
+      .name-title { font-size: 20px; margin-bottom: 20px; }
+      .handle { margin-bottom: 5px; }
+      .contact-row { display: flex; align-items: center; margin-bottom: 8px; }
+      .icon-space { margin-right: 12px; width: 18px; text-align: center; }
+
+      /* STATS GRID */
+      #stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
       }
-      .name-title {
-        font-size: 24px;
-        margin-bottom: 15px;
-        font-weight: bold;
-      }
-      .handle {
-        color: #555;
-        margin-bottom: 8px;
-        font-size: 18px;
-      }
-      .bio-paragraph {
-        margin-bottom: 25px;
-        line-height: 1.6;
-        font-size: 16px;
-      }
-      .contact-row {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-        font-size: 15px;
-      }
-      .icon-space {
-        margin-right: 15px;
-        width: 20px;
+
+      .stat-box {
+        padding: 20px;
+        border: 1px solid black;
+        background: white;
+        font-family: "Courier New", Courier, monospace;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 320px;
       }
 
-      .about-body {
-        padding: 40px;
-      }
-
-      /* DASHBOARD BUTTON */
-      .back-btn {
-        padding: 12px 25px;
-        background-color: #333;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        margin-top: 20px;
+      /* RECENT ACTIVITY */
+      .activity-body { padding: 20px 40px; }
+      .activity-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        font-size: 15px;
       }
     </style>
   </head>
@@ -216,54 +179,39 @@
         <h1>OneProfile</h1>
         <input type="text" placeholder="Search..." class="search-input" />
         <div class="header-right">
-          <div class="notification-dropdown">
-            <button class="notification-btn">🔔</button>
-            <div class="notification-menu">
-              <div class="notification-item">
-                Profile strength improved to 85%
-              </div>
-              <div class="notification-item">
-                Interview prep analysis completed
-              </div>
-            </div>
-          </div>
-          <div class="profile">
-            <img
-              src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg"
-              class="profile-picture"
-            />
+          <div class="profile-nav">
+            <img src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg" class="profile-picture" alt="Profile" />
             <p>Alex</p>
           </div>
         </div>
       </div>
     </header>
 
-    <div class="container">
+    <div class="container" style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
+      
       <div class="info-card">
         <div class="info-header">
           <span>PERSONAL INFORMATION</span>
-          <button class="action-btn">Edit Info</button>
+          <button>Edit Info</button>
         </div>
         <div class="info-body">
           <div class="photo-section">
-            <div class="photo-placeholder">[Photo]</div>
-            <button class="action-btn">Upload Photo</button>
+            <div class="photo-placeholder">Photo</div>
+            <div class="center-wrap">
+              <button>Upload Photo</button>
+            </div>
           </div>
           <div class="details-section">
             <div class="name-title">Alex Chen</div>
             <div class="handle">@alexchen</div>
-            <div class="bio-paragraph">
-              <div>Computer Science Student</div>
-              <div>University of Toronto</div>
-            </div>
-            <div class="contact-row">
-              <span class="icon-space">📍</span> Toronto, ON, Canada
-            </div>
-            <div class="contact-row">
-              <span class="icon-space">✉️</span> alex.chen@mail.utoronto.ca
-            </div>
-            <div class="contact-row">
-              <span class="icon-space">📱</span> +1 416-555-0123
+            <div class="contact-row"><span class="icon-space">📍</span> Toronto, ON, Canada</div>
+            <div class="contact-row"><span class="icon-space">✉️</span> alex.chen@mail.utoronto.ca</div>
+            <div class="contact-row"><span class="icon-space">📱</span> +1 416-555-0123</div>
+
+            <div style="margin-top: 20px">
+              <div class="contact-row"><span class="icon-space">🔗</span> linkedin.com/in/alexchen</div>
+              <div class="contact-row"><span class="icon-space">🔗</span> github.com/alexchen</div>
+              <div class="contact-row"><span class="icon-space">🔗</span> portfolio.alexchen.com</div>
             </div>
           </div>
         </div>
@@ -272,28 +220,91 @@
       <div class="info-card">
         <div class="info-header">
           <span>ABOUT ME</span>
-          <button class="action-btn">Edit Bio</button>
+          <button>Edit Bio</button>
         </div>
-        <div class="about-body">
-          <p class="bio-paragraph">
-            Passionate computer science student interested in AI and full-stack
-            development. Love building products that solve real problems.
-            Currently seeking summer 2026 internship opportunities in software
-            engineering.
+        <div class="activity-body">
+          <p style="line-height: 1.6; margin-bottom: 20px;">
+            Passionate computer science student interested in AI and full-stack development. 
+            Love building products that solve real problems. Currently seeking summer 2026 
+            internship opportunities in software engineering.
           </p>
-          <div class="contact-row">
-            <span class="icon-space">💼</span> Status: 🟢 Open to Work
+          <div class="contact-row">💼 Status: 🟢 Open to Work</div>
+          <div class="contact-row">🎯 Looking for: Software Engineering Intern</div>
+        </div>
+      </div>
+
+      <div id="stats">
+        <div class="stat-box">
+          <div>
+            <p>📚 Identity Vault</p>
+            <p style="margin: 10px 0">15 items</p>
+            <div style="text-align: left; font-size: 14px; margin-top: 15px">
+              <p>🎓 1 Degree</p>
+              <p>💼 3 Jobs</p>
+              <p>🚀 5 Projects</p>
+              <p>🛠️ 12 Skills</p>
+              <p>🏆 4 Awards</p>
+            </div>
           </div>
-          <div class="contact-row">
-            <span class="icon-space">🎯</span> Looking for: Software Engineering
-            Intern
+          <div class="center-wrap">
+            <button>View Vault →</button>
+          </div>
+        </div>
+
+        <div class="stat-box">
+          <div>
+            <p>📱 Social Posts</p>
+            <p style="margin: 10px 0">23 posts</p>
+            <div style="text-align: left; font-size: 14px; margin-top: 15px">
+              <p>✨ 156 Views</p>
+            </div>
+          </div>
+          <div class="center-wrap">
+            <button>View Posts →</button>
+          </div>
+        </div>
+
+        <div class="stat-box">
+          <div>
+            <p>📄 Resumes Created</p>
+            <p style="margin: 10px 0">8 resumes</p>
+            <div style="text-align: left; font-size: 14px; margin-top: 15px">
+              <p>📥 42 Downloads</p>
+            </div>
+          </div>
+          <div class="center-wrap">
+            <button>View All →</button>
           </div>
         </div>
       </div>
 
-      <a href="dashboard.html"
-        ><button class="back-btn">Back to Dashboard</button></a
-      >
+      <div class="info-card">
+        <div class="info-header">
+          <span>RECENT ACTIVITY</span>
+          <button onclick="location.href = 'dashboard.html'">View All →</button>
+        </div>
+        <div class="activity-body">
+          <div class="activity-item">
+            <span>📝 Generated LinkedIn post about UofTHacks</span>
+            <span style="color: #666">2 hours ago</span>
+          </div>
+          <div class="activity-item">
+            <span>📄 Updated resume for Google SWE position</span>
+            <span style="color: #666">1 day ago</span>
+          </div>
+          <div class="activity-item">
+            <span>🚀 Added new project: OneProfile</span>
+            <span style="color: #666">3 days ago</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="center-wrap" style="margin-top: 20px;">
+        <button onclick="location.href = 'dashboard.html'" style="padding: 12px 24px;">
+          Back to Dashboard
+        </button>
+      </div>
+
     </div>
   </body>
 </html>
