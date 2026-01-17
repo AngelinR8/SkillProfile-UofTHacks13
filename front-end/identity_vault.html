@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Identity Vault - OneProfile</title>
+    <style>
+      /* GLOBAL RESET */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        padding-bottom: 40px;
+      }
+
+      /* CONSISTENT HEADER STYLING */
+      header {
+        background-color: #333;
+        color: white;
+        padding: 20px;
+        width: 100%;
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .search-input {
+        max-width: 300px;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .profile-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .profile-picture {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+
+      /* MAIN CONTAINER */
+      .container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* SHARED CARD STYLING (MIMICKING PROFILE) */
+      .info-card {
+        background: white;
+        border: 1px solid black;
+        font-family: "Courier New", Courier, monospace;
+        width: 100%;
+        max-width: 900px;
+        margin-bottom: 30px;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+      }
+
+      .info-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid black;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .info-body {
+        padding: 30px 40px;
+      }
+
+      /* SOLID BLACK BUTTONS */
+      button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 13px;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background-color: #555;
+      }
+
+      /* VAULT SPECIFIC LAYOUT */
+      .vault-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .stat-item {
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .center-wrap {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      h2 {
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 20px;
+        text-align: left;
+        width: 100%;
+        max-width: 900px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <h1 style="cursor: pointer" onclick="location.href = 'dashboard.html'">
+          OneProfile
+        </h1>
+        <input type="text" placeholder="Search Vault..." class="search-input" />
+        <div class="header-right">
+          <div class="profile-nav">
+            <img
+              src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg"
+              class="profile-picture"
+              alt="Profile"
+            />
+            <p>Alex</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <h2>Identity Vault</h2>
+
+      <div class="info-card">
+        <div class="info-header">
+          <span>VAULT OVERVIEW</span>
+          <button>Add New Item</button>
+        </div>
+        <div class="info-body">
+          <div class="vault-stats">
+              <p><strong>Total Items:</strong> 25</p>
+              <p>🎓 Degrees: 1  💼 Jobs: 3  🚀 Projects: 5</p>
+              <p>🛠️ Skills: 12  🏆 Awards: 4</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="center-wrap">
+        <button
+          onclick="location.href = 'dashboard.html'"
+          style="padding: 12px 24px"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
