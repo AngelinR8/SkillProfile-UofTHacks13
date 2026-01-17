@@ -59,7 +59,6 @@
         border-radius: 50%;
       }
 
-
       /* SHARED CARD STYLING */
       .info-card {
         background: white;
@@ -107,6 +106,13 @@
         background-color: #555;
       }
 
+      /* VISUAL FEEDBACK FOR EDITING */
+      #bio[contenteditable="true"] {
+        outline: 2px dashed #333;
+        background-color: #fffdf0;
+        min-height: 50px;
+      }
+
       /* CENTER WRAP FIX */
       .center-wrap {
         display: flex;
@@ -133,11 +139,26 @@
       }
 
       /* DETAILS SECTION */
-      .details-section { flex: 1; }
-      .name-title { font-size: 20px; margin-bottom: 20px; }
-      .handle { margin-bottom: 5px; }
-      .contact-row { display: flex; align-items: center; margin-bottom: 8px; }
-      .icon-space { margin-right: 12px; width: 18px; text-align: center; }
+      .details-section {
+        flex: 1;
+      }
+      .name-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
+      .handle {
+        margin-bottom: 5px;
+      }
+      .contact-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .icon-space {
+        margin-right: 12px;
+        width: 18px;
+        text-align: center;
+      }
 
       /* STATS GRID */
       #stats {
@@ -162,7 +183,9 @@
       }
 
       /* RECENT ACTIVITY */
-      .activity-body { padding: 20px 40px; }
+      .activity-body {
+        padding: 20px 40px;
+      }
       .activity-item {
         display: flex;
         justify-content: space-between;
@@ -180,15 +203,26 @@
         <input type="text" placeholder="Search..." class="search-input" />
         <div class="header-right">
           <div class="profile-nav">
-            <img src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg" class="profile-picture" alt="Profile" />
+            <img
+              src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg"
+              class="profile-picture"
+              alt="Profile"
+            />
             <p>Alex</p>
           </div>
         </div>
       </div>
     </header>
 
-    <div class="container" style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
-      
+    <div
+      class="container"
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      "
+    >
       <div class="info-card">
         <div class="info-header">
           <span>PERSONAL INFORMATION</span>
@@ -204,14 +238,26 @@
           <div class="details-section">
             <div class="name-title">Alex Chen</div>
             <div class="handle">@alexchen</div>
-            <div class="contact-row"><span class="icon-space">📍</span> Toronto, ON, Canada</div>
-            <div class="contact-row"><span class="icon-space">✉️</span> alex.chen@mail.utoronto.ca</div>
-            <div class="contact-row"><span class="icon-space">📱</span> +1 416-555-0123</div>
+            <div class="contact-row">
+              <span class="icon-space">📍</span> Toronto, ON, Canada
+            </div>
+            <div class="contact-row">
+              <span class="icon-space">✉️</span> alex.chen@mail.utoronto.ca
+            </div>
+            <div class="contact-row">
+              <span class="icon-space">📱</span> +1 416-555-0123
+            </div>
 
             <div style="margin-top: 20px">
-              <div class="contact-row"><span class="icon-space">🔗</span> linkedin.com/in/alexchen</div>
-              <div class="contact-row"><span class="icon-space">🔗</span> github.com/alexchen</div>
-              <div class="contact-row"><span class="icon-space">🔗</span> portfolio.alexchen.com</div>
+              <div class="contact-row">
+                <span class="icon-space">🔗</span> linkedin.com/in/alexchen
+              </div>
+              <div class="contact-row">
+                <span class="icon-space">🔗</span> github.com/alexchen
+              </div>
+              <div class="contact-row">
+                <span class="icon-space">🔗</span> portfolio.alexchen.com
+              </div>
             </div>
           </div>
         </div>
@@ -220,16 +266,22 @@
       <div class="info-card">
         <div class="info-header">
           <span>ABOUT ME</span>
-          <button>Edit Bio</button>
+          <div>
+            <button id="edit_bio">Edit Bio</button>
+            <button id="end_bio_editing">Done</button>
+          </div>
         </div>
-        <div class="activity-body">
-          <p style="line-height: 1.6; margin-bottom: 20px;">
-            Passionate computer science student interested in AI and full-stack development. 
-            Love building products that solve real problems. Currently seeking summer 2026 
-            internship opportunities in software engineering.
+        <div id="bio" class="activity-body">
+          <p style="line-height: 1.6; margin-bottom: 20px">
+            Passionate computer science student interested in AI and full-stack
+            development. Love building products that solve real problems.
+            Currently seeking summer 2026 internship opportunities in software
+            engineering.
           </p>
           <div class="contact-row">💼 Status: 🟢 Open to Work</div>
-          <div class="contact-row">🎯 Looking for: Software Engineering Intern</div>
+          <div class="contact-row">
+            🎯 Looking for: Software Engineering Intern
+          </div>
         </div>
       </div>
 
@@ -299,12 +351,16 @@
         </div>
       </div>
 
-      <div class="center-wrap" style="margin-top: 20px;">
-        <button onclick="location.href = 'dashboard.html'" style="padding: 12px 24px;">
+      <div class="center-wrap" style="margin-top: 20px">
+        <button
+          onclick="location.href = 'dashboard.html'"
+          style="padding: 12px 24px"
+        >
           Back to Dashboard
         </button>
       </div>
-
     </div>
+
+    <script src="script.js"></script>
   </body>
 </html>
