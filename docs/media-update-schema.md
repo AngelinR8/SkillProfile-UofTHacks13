@@ -53,6 +53,7 @@ Represents suggested updates to the Skills section.
 
 ```ts
 SkillsUpdate {
+  shouldUpdate: boolean
   add: string[]
   strengthen: string[]
   reason: string
@@ -65,6 +66,7 @@ Represents suggested content for a LinkedIn post describing the progress.
 
 ```ts
 PostUpdate {
+  shouldUpdate: boolean
   tone: string
   content: string
   suggestedHashtags: string[]
@@ -90,11 +92,13 @@ PostUpdate {
     "suggestedBullet": "Built an internal React + Python tool to automate repetitive workflows, improving team efficiency"
   },
   "skills": {
+    "shouldUpdate": true,
     "add": ["React", "Python"],
     "strengthen": ["Automation", "Internal Tools"],
     "reason": "Used directly in a real production task"
   },
   "post": {
+    "shouldUpdate": true,
     "tone": "Professional",
     "content": "This week at Google, I had the chance to build an internal tool using React and Python to streamline repetitive workflows. It was exciting to see how small tools can create real impact within a team. Looking forward to learning more and contributing further.",
     "suggestedHashtags": ["#internship", "#softwareengineering", "#react", "#learning"]
