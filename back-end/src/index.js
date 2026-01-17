@@ -32,21 +32,12 @@ app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
-import Skill from "../models/Skill.js";
-
-// GET all skills
-app.get("/api/skills", async (req, res) => {
-  const skills = await Skill.find();
-  res.json(skills);
-});
-
-// POST new skill
-app.post("/api/skills", async (req, res) => {
-  const { skill } = req.body;
-  const newSkill = new Skill({ name: skill });
-  await newSkill.save();
-  res.json({ status: "ok", skill: newSkill });
-});
+// Import all models
+import User from "../models/User.js";
+import EducationEntry from "../models/EducationEntry.js";
+import ExperienceEntry from "../models/ExperienceEntry.js";
+import SkillEntry from "../models/SkillEntry.js";
+import ProgressUpdate from "../models/ProgressUpdate.js";
 
 // Start the server
 app.listen(PORT, () => {
