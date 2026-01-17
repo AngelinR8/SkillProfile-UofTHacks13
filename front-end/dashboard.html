@@ -166,7 +166,67 @@
         <input type="text" placeholder="Search..." class="search-input" />
 
         <div class="header-right">
-          <span>🔔</span>
+          <div class="notification-dropdown">
+            <button class="notification-btn">🔔</button>
+            <div class="notification-menu">
+              <div class="notification-item">
+                Profile strength improved to 85%
+              </div>
+              <div class="notification-item">
+                Interview prep analysis completed
+              </div>
+              h
+            </div>
+          </div>
+
+          <style>
+            .notification-dropdown {
+              position: relative;
+            }
+
+            .notification-btn {
+              background: none;
+              border: none;
+              color: white;
+              font-size: 24px;
+              cursor: pointer;
+            }
+
+            .notification-menu {
+              display: none;
+              position: absolute;
+              top: 100%;
+              right: 0;
+              background-color: white;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              min-width: 250px;
+              z-index: 1000;
+              margin-top: 8px;
+            }
+
+            .notification-item {
+              padding: 12px;
+              border-bottom: 1px solid #eee;
+              font-size: 14px;
+              color: #333;
+              cursor: pointer;
+            }
+
+            .notification-item:last-child {
+              border-bottom: none;
+            }
+
+            .notification-item:hover {
+              background-color: #f5f5f5;
+            }
+
+            .notification-btn:hover + .notification-menu,
+            .notification-menu:hover {
+              display: block;
+            }
+          </style>
           <div class="profile">
             <img
               src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg"
