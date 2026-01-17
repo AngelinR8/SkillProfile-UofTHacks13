@@ -1,4 +1,5 @@
 <!doctype html>
+<script src="script.js"></script>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -244,8 +245,17 @@
           <span>🔧</span>
           <h2>Skills</h2>
         </div>
-        <p>Python, R, SQL, JavaScript</p>
-        <button>Add Skill</button>
+
+        <ul id="skillsList" style="margin-left: 20px; margin-bottom: 10px;"></ul>
+
+        <input 
+          type="text" 
+          id="skillInput" 
+          placeholder="Add a skill..." 
+          style="padding: 8px; width: 80%; margin-top: 10px;"
+        />
+
+        <button onclick="addSkill()">Add Skill</button>
       </div>
 
       <!-- Certificates / Optional Additional Card -->
