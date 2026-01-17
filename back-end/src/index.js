@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch(err => console.error(err));
-
+console.log("MONGO_URI:", process.env.MONGO_URI);
 const app = express();
 const PORT = 5000;
 
