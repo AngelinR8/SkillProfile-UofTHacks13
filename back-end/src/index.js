@@ -8,7 +8,9 @@ import mongoose from "mongoose";
 import User from "../models/User.js";
 import EducationEntry from "../models/EducationEntry.js";
 import ExperienceEntry from "../models/ExperienceEntry.js";
+import ProjectEntry from "../models/ProjectEntry.js";
 import SkillEntry from "../models/SkillEntry.js";
+import AwardEntry from "../models/AwardEntry.js";
 import ProgressUpdate from "../models/ProgressUpdate.js";
 
 // Connect to MongoDB
@@ -22,6 +24,36 @@ const PORT = 5000;
 // Middleware
 app.use(cors()); // Allow frontend to access this API
 app.use(express.json()); // Parse JSON request bodies
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    status: "error", 
+    message: "Internal server error",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined
+  });
+});
+
+// Helper function for consistent success responses
+const sendSuccess = (res, data, statusCode = 200) => {
+  res.status(statusCode).json({
+    status: "success",
+    ...data
+  });
+};
+
+// Helper function for consistent error responses
+const sendError = (res, message, statusCode = 400, errors = null) => {
+  const response = {
+    status: "error",
+    message
+  };
+  if (errors) {
+    response.errors = errors;
+  }
+  res.status(statusCode).json(response);
+};
 
 // Root route
 app.get("/", (req, res) => {
@@ -52,13 +84,13 @@ app.get("/api/user/profile", async (req, res) => {
     let user = await User.findOne();
     if (!user) {
       user = await User.create({
-        email: "demo@example.com",
-        fullName: "Demo User"
+        fullName: "Alex Chen",
+        summary: "Computer Science student passionate about full-stack development"
       });
     }
-    res.json({ user });
+    sendSuccess(res, { user });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error.message, 500);
   }
 });
 
@@ -69,11 +101,11 @@ app.put("/api/user/profile", async (req, res) => {
     if (!user) {
       user = await User.create(req.body);
     } else {
-      user = await User.findByIdAndUpdate(user._id, req.body, { new: true });
+      user = await User.findByIdAndUpdate(user._id, req.body, { new: true, runValidators: true });
     }
-    res.json({ status: "success", user });
+    sendSuccess(res, { user });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error.message, 400);
   }
 });
 
@@ -85,23 +117,28 @@ app.put("/api/user/profile", async (req, res) => {
 app.get("/api/education", async (req, res) => {
   try {
     const education = await EducationEntry.find({ userId: DEMO_USER_ID }).sort({ startDate: -1 });
-    res.json({ education });
+    sendSuccess(res, { education });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error.message, 500);
   }
 });
 
 // POST create education entry
 app.post("/api/education", async (req, res) => {
   try {
+    // Basic validation
+    if (!req.body.institution || !req.body.degree || !req.body.fieldOfStudy) {
+      return sendError(res, "Missing required fields: institution, degree, fieldOfStudy", 400);
+    }
+    
     const educationData = {
       ...req.body,
       userId: DEMO_USER_ID
     };
     const education = await EducationEntry.create(educationData);
-    res.status(201).json({ status: "success", education });
+    sendSuccess(res, { education }, 201);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    sendError(res, error.message, 400);
   }
 });
 
@@ -114,11 +151,11 @@ app.put("/api/education/:id", async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!education) {
-      return res.status(404).json({ error: "Education entry not found" });
+      return sendError(res, "Education entry not found", 404);
     }
-    res.json({ status: "success", education });
+    sendSuccess(res, { education });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    sendError(res, error.message, 400);
   }
 });
 
@@ -127,11 +164,11 @@ app.delete("/api/education/:id", async (req, res) => {
   try {
     const education = await EducationEntry.findByIdAndDelete(req.params.id);
     if (!education) {
-      return res.status(404).json({ error: "Education entry not found" });
+      return sendError(res, "Education entry not found", 404);
     }
-    res.json({ status: "success", message: "Education entry deleted" });
+    sendSuccess(res, { message: "Education entry deleted" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error.message, 500);
   }
 });
 
@@ -145,23 +182,27 @@ app.get("/api/experience", async (req, res) => {
     const experiences = await ExperienceEntry.find({ userId: DEMO_USER_ID })
       .populate("skills")
       .sort({ startDate: -1 });
-    res.json({ experiences });
+    sendSuccess(res, { experiences });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error.message, 500);
   }
 });
 
 // POST create experience entry
 app.post("/api/experience", async (req, res) => {
   try {
+    if (!req.body.title || !req.body.employmentType) {
+      return sendError(res, "Missing required fields: title, employmentType", 400);
+    }
+    
     const experienceData = {
       ...req.body,
       userId: DEMO_USER_ID
     };
     const experience = await ExperienceEntry.create(experienceData);
-    res.status(201).json({ status: "success", experience });
+    sendSuccess(res, { experience }, 201);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    sendError(res, error.message, 400);
   }
 });
 
@@ -174,11 +215,11 @@ app.put("/api/experience/:id", async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!experience) {
-      return res.status(404).json({ error: "Experience entry not found" });
+      return sendError(res, "Experience entry not found", 404);
     }
-    res.json({ status: "success", experience });
+    sendSuccess(res, { experience });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    sendError(res, error.message, 400);
   }
 });
 
@@ -187,11 +228,11 @@ app.delete("/api/experience/:id", async (req, res) => {
   try {
     const experience = await ExperienceEntry.findByIdAndDelete(req.params.id);
     if (!experience) {
-      return res.status(404).json({ error: "Experience entry not found" });
+      return sendError(res, "Experience entry not found", 404);
     }
-    res.json({ status: "success", message: "Experience entry deleted" });
+    sendSuccess(res, { message: "Experience entry deleted" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error.message, 500);
   }
 });
 
@@ -203,23 +244,27 @@ app.delete("/api/experience/:id", async (req, res) => {
 app.get("/api/skills", async (req, res) => {
   try {
     const skills = await SkillEntry.find({ userId: DEMO_USER_ID }).sort({ name: 1 });
-    res.json({ skills });
+    sendSuccess(res, { skills });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error.message, 500);
   }
 });
 
 // POST create skill entry
 app.post("/api/skills", async (req, res) => {
   try {
+    if (!req.body.name || !req.body.category || !req.body.proficiency) {
+      return sendError(res, "Missing required fields: name, category, proficiency", 400);
+    }
+    
     const skillData = {
       ...req.body,
       userId: DEMO_USER_ID
     };
     const skill = await SkillEntry.create(skillData);
-    res.status(201).json({ status: "success", skill });
+    sendSuccess(res, { skill }, 201);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    sendError(res, error.message, 400);
   }
 });
 
@@ -232,11 +277,11 @@ app.put("/api/skills/:id", async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!skill) {
-      return res.status(404).json({ error: "Skill entry not found" });
+      return sendError(res, "Skill entry not found", 404);
     }
-    res.json({ status: "success", skill });
+    sendSuccess(res, { skill });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    sendError(res, error.message, 400);
   }
 });
 
@@ -245,11 +290,170 @@ app.delete("/api/skills/:id", async (req, res) => {
   try {
     const skill = await SkillEntry.findByIdAndDelete(req.params.id);
     if (!skill) {
-      return res.status(404).json({ error: "Skill entry not found" });
+      return sendError(res, "Skill entry not found", 404);
     }
-    res.json({ status: "success", message: "Skill entry deleted" });
+    sendSuccess(res, { message: "Skill entry deleted" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error.message, 500);
+  }
+});
+
+// --------------------------------------------
+// PROJECT ENDPOINTS
+// --------------------------------------------
+
+// GET all project entries
+app.get("/api/projects", async (req, res) => {
+  try {
+    const projects = await ProjectEntry.find({ userId: DEMO_USER_ID })
+      .populate("skills")
+      .sort({ startDate: -1 });
+    sendSuccess(res, { projects });
+  } catch (error) {
+    sendError(res, error.message, 500);
+  }
+});
+
+// POST create project entry
+app.post("/api/projects", async (req, res) => {
+  try {
+    if (!req.body.name) {
+      return sendError(res, "Missing required field: name", 400);
+    }
+    
+    const projectData = {
+      ...req.body,
+      userId: DEMO_USER_ID
+    };
+    const project = await ProjectEntry.create(projectData);
+    sendSuccess(res, { project }, 201);
+  } catch (error) {
+    sendError(res, error.message, 400);
+  }
+});
+
+// PUT update project entry
+app.put("/api/projects/:id", async (req, res) => {
+  try {
+    const project = await ProjectEntry.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!project) {
+      return sendError(res, "Project entry not found", 404);
+    }
+    sendSuccess(res, { project });
+  } catch (error) {
+    sendError(res, error.message, 400);
+  }
+});
+
+// DELETE project entry
+app.delete("/api/projects/:id", async (req, res) => {
+  try {
+    const project = await ProjectEntry.findByIdAndDelete(req.params.id);
+    if (!project) {
+      return sendError(res, "Project entry not found", 404);
+    }
+    sendSuccess(res, { message: "Project entry deleted" });
+  } catch (error) {
+    sendError(res, error.message, 500);
+  }
+});
+
+// --------------------------------------------
+// AWARD ENDPOINTS
+// --------------------------------------------
+
+// GET all award entries
+app.get("/api/awards", async (req, res) => {
+  try {
+    const awards = await AwardEntry.find({ userId: DEMO_USER_ID })
+      .sort({ date: -1 });
+    sendSuccess(res, { awards });
+  } catch (error) {
+    sendError(res, error.message, 500);
+  }
+});
+
+// POST create award entry
+app.post("/api/awards", async (req, res) => {
+  try {
+    if (!req.body.title || !req.body.date) {
+      return sendError(res, "Missing required fields: title, date", 400);
+    }
+    
+    const awardData = {
+      ...req.body,
+      userId: DEMO_USER_ID
+    };
+    const award = await AwardEntry.create(awardData);
+    sendSuccess(res, { award }, 201);
+  } catch (error) {
+    sendError(res, error.message, 400);
+  }
+});
+
+// PUT update award entry
+app.put("/api/awards/:id", async (req, res) => {
+  try {
+    const award = await AwardEntry.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!award) {
+      return sendError(res, "Award entry not found", 404);
+    }
+    sendSuccess(res, { award });
+  } catch (error) {
+    sendError(res, error.message, 400);
+  }
+});
+
+// DELETE award entry
+app.delete("/api/awards/:id", async (req, res) => {
+  try {
+    const award = await AwardEntry.findByIdAndDelete(req.params.id);
+    if (!award) {
+      return sendError(res, "Award entry not found", 404);
+    }
+    sendSuccess(res, { message: "Award entry deleted" });
+  } catch (error) {
+    sendError(res, error.message, 500);
+  }
+});
+
+// --------------------------------------------
+// VAULT STATISTICS ENDPOINT
+// --------------------------------------------
+
+// GET vault statistics
+app.get("/api/vault/stats", async (req, res) => {
+  try {
+    const [degrees, experiences, projects, skills, awards] = await Promise.all([
+      EducationEntry.countDocuments({ userId: DEMO_USER_ID }),
+      ExperienceEntry.countDocuments({ userId: DEMO_USER_ID }),
+      ProjectEntry.countDocuments({ userId: DEMO_USER_ID }),
+      SkillEntry.countDocuments({ userId: DEMO_USER_ID }),
+      AwardEntry.countDocuments({ userId: DEMO_USER_ID })
+    ]);
+
+    const total = degrees + experiences + projects + skills + awards;
+
+    sendSuccess(res, {
+      stats: {
+        degrees,
+        experiences,
+        projects,
+        skills,
+        awards,
+        total
+      }
+    });
+  } catch (error) {
+    sendError(res, error.message, 500);
   }
 });
 

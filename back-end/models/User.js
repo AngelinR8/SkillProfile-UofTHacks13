@@ -1,12 +1,11 @@
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
+  // Since we're not implementing login, email is optional
   email: { 
     type: String, 
-    required: true, 
-    unique: true,
-    lowercase: true,
-    trim: true
+    trim: true,
+    lowercase: true
   },
   fullName: { 
     type: String, 
@@ -21,21 +20,22 @@ const UserSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  linkedInUrl: { 
-    type: String,
-    trim: true
-  },
-  githubUrl: { 
-    type: String,
-    trim: true
-  },
-  personalWebsite: { 
-    type: String,
-    trim: true
-  },
+  // Links stored as array for flexibility
+  links: [{
+    platform: {
+      type: String,
+      enum: ["linkedin", "github", "twitter", "personal", "other"],
+      required: true
+    },
+    url: {
+      type: String,
+      required: true,
+      trim: true
+    }
+  }],
   summary: { 
     type: String,
-    trim: true
+    trim: true  // Brief professional summary/bio
   }
 }, {
   timestamps: true  // Automatically adds createdAt and updatedAt fields

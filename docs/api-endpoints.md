@@ -22,12 +22,13 @@ Get the current user's profile information.
 {
   "user": {
     "_id": "507f1f77bcf86cd799439011",
-    "email": "alex@example.com",
     "fullName": "Alex Chen",
     "phone": "+1-555-0123",
     "location": "Toronto, Canada",
-    "linkedInUrl": "https://linkedin.com/in/alexchen",
-    "githubUrl": "https://github.com/alexchen",
+    "links": [
+      { "platform": "linkedin", "url": "https://linkedin.com/in/alexchen" },
+      { "platform": "github", "url": "https://github.com/alexchen" }
+    ],
     "summary": "Computer Science student...",
     "createdAt": "2024-01-15T10:00:00Z",
     "updatedAt": "2024-02-01T14:30:00Z"
@@ -44,8 +45,10 @@ Update user profile information.
   "fullName": "Alex Chen",
   "phone": "+1-555-0123",
   "location": "Toronto, Canada",
-  "linkedInUrl": "https://linkedin.com/in/alexchen",
-  "githubUrl": "https://github.com/alexchen",
+  "links": [
+    { "platform": "linkedin", "url": "https://linkedin.com/in/alexchen" },
+    { "platform": "github", "url": "https://github.com/alexchen" }
+  ],
   "summary": "Updated summary..."
 }
 ```
@@ -294,13 +297,92 @@ Delete a skill entry.
 
 ---
 
+### 1.5 Project Entries
+
+#### GET `/api/projects`
+Get all project entries for the current user.
+
+#### POST `/api/projects`
+Create a new project entry.
+
+**Request Body:**
+```json
+{
+  "name": "OneProfile",
+  "description": "AI-powered career assistant platform",
+  "startDate": "2024-01-01",
+  "endDate": null,
+  "bullets": ["Built full-stack application..."],
+  "technologies": ["React", "Node.js", "MongoDB"],
+  "url": "https://github.com/alexchen/oneprofile",
+  "tags": ["web", "ai"]
+}
+```
+
+#### PUT `/api/projects/:id`
+Update an existing project entry.
+
+#### DELETE `/api/projects/:id`
+Delete a project entry.
+
+---
+
+### 1.6 Award Entries
+
+#### GET `/api/awards`
+Get all award entries for the current user.
+
+#### POST `/api/awards`
+Create a new award entry.
+
+**Request Body:**
+```json
+{
+  "title": "Dean's List",
+  "issuer": "University of Toronto",
+  "date": "2024-01-15",
+  "description": "Achieved Dean's List for academic excellence",
+  "category": "academic",
+  "tags": ["academic", "excellence"]
+}
+```
+
+#### PUT `/api/awards/:id`
+Update an existing award entry.
+
+#### DELETE `/api/awards/:id`
+Delete an award entry.
+
+---
+
+### 1.7 Vault Statistics
+
+#### GET `/api/vault/stats`
+Get statistics for all Identity Vault entries.
+
+**Response:**
+```json
+{
+  "stats": {
+    "degrees": 1,
+    "experiences": 3,
+    "projects": 5,
+    "skills": 12,
+    "awards": 4,
+    "total": 25
+  }
+}
+```
+
+---
+
 ## 2. Progress Update & AI Processing Endpoints
 
 ### 2.1 Submit Progress Update
 
 #### POST `/api/progress/update`
 Submit a new progress update (raw text description). The system will:
-1. Extract entities (education, experience, skills)
+1. Extract entities (education, experience, project, award, skills)
 2. Use AI to polish and enhance the content
 3. Store atomic entries in Identity Vault
 4. Generate LinkedIn update suggestions

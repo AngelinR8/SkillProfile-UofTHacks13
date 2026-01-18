@@ -21,8 +21,9 @@ const ExperienceEntrySchema = new mongoose.Schema({
   },
   employmentType: {
     type: String,
-    enum: ["full-time", "part-time", "contract", "internship", "freelance", "project"],
+    enum: ["full-time", "part-time", "contract", "internship", "freelance"],
     required: true
+    // Note: "project" removed - projects should use ProjectEntry instead
   },
   startDate: {
     type: Date,

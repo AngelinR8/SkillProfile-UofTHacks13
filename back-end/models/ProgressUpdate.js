@@ -22,6 +22,12 @@ const ProgressUpdateSchema = new mongoose.Schema({
     experience: {
       type: mongoose.Schema.Types.Mixed  // Partial ExperienceEntry structure
     },
+    project: {
+      type: mongoose.Schema.Types.Mixed  // Partial ProjectEntry structure
+    },
+    award: {
+      type: mongoose.Schema.Types.Mixed  // Partial AwardEntry structure
+    },
     skills: [{
       type: String  // Skill names extracted
     }]
@@ -31,6 +37,12 @@ const ProgressUpdateSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.Mixed
     },
     polishedExperience: {
+      type: mongoose.Schema.Types.Mixed
+    },
+    polishedProject: {
+      type: mongoose.Schema.Types.Mixed
+    },
+    polishedAward: {
       type: mongoose.Schema.Types.Mixed
     },
     identifiedSkills: [{

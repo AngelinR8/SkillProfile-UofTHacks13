@@ -8,12 +8,14 @@ The Identity Vault serves as the single source of truth for a user's professiona
 
 ## Overview
 
-The Identity Vault contains four main entity types:
+The Identity Vault contains six main entity types:
 
 1. **User Profile** - Personal information and contact details
-2. **Education Entries** - Atomic education records
-3. **Experience Entries** - Atomic work/experience records
-4. **Skill Entries** - Atomic skill records with metadata
+2. **Education Entries** - Atomic education records (degrees)
+3. **Experience Entries** - Atomic work/employment records (jobs)
+4. **Project Entries** - Atomic project records
+5. **Skill Entries** - Atomic skill records with metadata
+6. **Award Entries** - Atomic award/achievement records
 
 All entries are stored independently and can be tagged, filtered, and recombined based on target context (job application, resume type, etc.).
 
@@ -26,13 +28,14 @@ Represents the user's basic profile information.
 ```ts
 User {
   _id: ObjectId
-  email: string
+  email?: string  // Optional since no login system
   fullName: string
   phone?: string
   location?: string
-  linkedInUrl?: string
-  githubUrl?: string
-  personalWebsite?: string
+  links?: [{
+    platform: "linkedin" | "github" | "twitter" | "personal" | "other"
+    url: string
+  }]
   summary?: string  // Brief professional summary/bio
   createdAt: Date
   updatedAt: Date
@@ -74,9 +77,10 @@ ExperienceEntry {
   _id: ObjectId
   userId: ObjectId  // Reference to User
   title: string
-  company?: string  // null for personal projects
+  company?: string
   location?: string
-  employmentType: "full-time" | "part-time" | "contract" | "internship" | "freelance" | "project"
+  employmentType: "full-time" | "part-time" | "contract" | "internship" | "freelance"
+  // Note: "project" removed - projects should use ProjectEntry instead
   startDate: Date
   endDate?: Date  // null if current position
   bullets: string[]  // Array of AI-enhanced bullet points
@@ -112,7 +116,53 @@ SkillEntry {
 
 ---
 
-## 5. ProgressUpdate (Input Schema)
+## 5. ProjectEntry
+
+Represents an atomic project record.
+
+```ts
+ProjectEntry {
+  _id: ObjectId
+  userId: ObjectId  // Reference to User
+  name: string  // Project name
+  description?: string  // Overall project description
+  startDate: Date
+  endDate?: Date  // null if ongoing project
+  bullets: string[]  // Array of AI-enhanced bullet points describing the project
+  technologies: string[]  // Technologies used (e.g., "React", "Node.js", "MongoDB")
+  skills: ObjectId[]  // References to SkillEntry documents
+  url?: string  // Project URL (GitHub, demo, etc.)
+  achievements?: string[]  // Notable achievements or outcomes
+  tags?: string[]  // For categorization (e.g., "web", "mobile", "ai")
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+---
+
+## 6. AwardEntry
+
+Represents an atomic award or achievement record.
+
+```ts
+AwardEntry {
+  _id: ObjectId
+  userId: ObjectId  // Reference to User
+  title: string  // Award title (e.g., "Dean's List", "Best Hack")
+  issuer?: string  // Organization/institution that issued the award
+  date: Date  // When the award was received
+  description?: string  // Description of the award and why it was received
+  category: "academic" | "professional" | "competition" | "recognition" | "other"
+  tags?: string[]  // For categorization (e.g., "hackathon", "academic")
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+---
+
+## 7. ProgressUpdate (Input Schema)
 
 Represents the raw user input when they describe a new achievement or progress.
 
@@ -121,15 +171,19 @@ ProgressUpdate {
   _id: ObjectId
   userId: ObjectId
   rawText: string  // The user's natural language description
-  processedAt: Date  // When AI processing completed
+  processedAt?: Date  // When AI processing completed
   extractedEntities: {
     education?: Partial<EducationEntry>
     experience?: Partial<ExperienceEntry>
+    project?: Partial<ProjectEntry>
+    award?: Partial<AwardEntry>
     skills?: string[]  // Skill names extracted
   }
   aiEnhancement?: {
-    polishedEducation?: EducationEntry
-    polishedExperience?: ExperienceEntry
+    polishedEducation?: Partial<EducationEntry>
+    polishedExperience?: Partial<ExperienceEntry>
+    polishedProject?: Partial<ProjectEntry>
+    polishedAward?: Partial<AwardEntry>
     identifiedSkills?: string[]
   }
   createdAt: Date
@@ -138,32 +192,42 @@ ProgressUpdate {
 
 ---
 
-## 6. Database Relationships
+## 8. Database Relationships
 
 ```
 User (1) ──< (many) EducationEntry
 User (1) ──< (many) ExperienceEntry
+User (1) ──< (many) ProjectEntry
 User (1) ──< (many) SkillEntry
+User (1) ──< (many) AwardEntry
 User (1) ──< (many) ProgressUpdate
 
 ExperienceEntry (many) ──> (many) SkillEntry  // Through skills array
+ProjectEntry (many) ──> (many) SkillEntry  // Through skills array
 ```
 
 ---
 
-## 7. Example Data
+## 9. Example Data
 
 ### User Example
 
 ```json
 {
   "_id": "507f1f77bcf86cd799439011",
-  "email": "alex@example.com",
   "fullName": "Alex Chen",
   "phone": "+1-555-0123",
   "location": "Toronto, Canada",
-  "linkedInUrl": "https://linkedin.com/in/alexchen",
-  "githubUrl": "https://github.com/alexchen",
+  "links": [
+    {
+      "platform": "linkedin",
+      "url": "https://linkedin.com/in/alexchen"
+    },
+    {
+      "platform": "github",
+      "url": "https://github.com/alexchen"
+    }
+  ],
   "summary": "Computer Science student passionate about full-stack development",
   "createdAt": "2024-01-15T10:00:00Z",
   "updatedAt": "2024-02-01T14:30:00Z"
@@ -232,9 +296,51 @@ ExperienceEntry (many) ──> (many) SkillEntry  // Through skills array
 }
 ```
 
+### ProjectEntry Example
+
+```json
+{
+  "_id": "507f1f77bcf86cd799439016",
+  "userId": "507f1f77bcf86cd799439011",
+  "name": "OneProfile",
+  "description": "AI-powered career assistant platform",
+  "startDate": "2024-01-01",
+  "endDate": null,
+  "bullets": [
+    "Built full-stack application using React and Node.js",
+    "Integrated Gemini API for AI-powered content generation",
+    "Implemented MongoDB for atomic data storage"
+  ],
+  "technologies": ["React", "Node.js", "MongoDB", "Gemini API"],
+  "skills": ["507f1f77bcf86cd799439014"],
+  "url": "https://github.com/alexchen/oneprofile",
+  "achievements": ["Won Best Use of Gemini API at UofTHacks"],
+  "tags": ["web", "ai", "full-stack"],
+  "createdAt": "2024-01-15T10:00:00Z",
+  "updatedAt": "2024-02-01T14:30:00Z"
+}
+```
+
+### AwardEntry Example
+
+```json
+{
+  "_id": "507f1f77bcf86cd799439017",
+  "userId": "507f1f77bcf86cd799439011",
+  "title": "Dean's List",
+  "issuer": "University of Toronto",
+  "date": "2024-01-15",
+  "description": "Achieved Dean's List for academic excellence",
+  "category": "academic",
+  "tags": ["academic", "excellence"],
+  "createdAt": "2024-01-15T10:00:00Z",
+  "updatedAt": "2024-02-01T14:30:00Z"
+}
+```
+
 ---
 
-## 8. Design Principles
+## 10. Design Principles
 
 1. **Atomicity**: Each entry is independent and can be used in multiple contexts
 2. **AI Enhancement**: All descriptive text is AI-polished to be professional and impactful

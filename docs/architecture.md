@@ -8,7 +8,7 @@ This document describes the overall architecture of OneProfile, including system
 
 OneProfile is a full-stack web application that helps users manage their professional identity across multiple platforms. The system consists of:
 
-- **Frontend**: React-based web application
+- **Frontend**: HTML/CSS/JavaScript web application
 - **Backend**: Express.js REST API server
 - **Database**: MongoDB for persistent data storage
 - **AI Service**: Google Gemini API for content generation and processing
@@ -27,14 +27,15 @@ OneProfile is a full-stack web application that helps users manage their profess
        │ HTTP/REST API
        │
 ┌──────▼─────────────────────────────────────┐
-│           Frontend (React)                 │
+│        Frontend (HTML/CSS/JS)              │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐ │
-│  │ Progress │  │ Identity │  │ Resume   │ │
-│  │  Update  │  │  Vault   │  │ Builder  │ │
-│  └──────────┘  └──────────┘  └──────────┘ │
+│  │ Social   │  │ Identity │  │ Resume   │ │
+│  │  Media   │  │  Vault   │  │ Builder  │ │
+│  │Assistant │  └──────────┘  └──────────┘ │
+│  └──────────┘                              │
 │  ┌──────────┐  ┌──────────┐               │
-│  │LinkedIn  │  │Interview │               │
-│  │ Generator│  │Simulator │               │
+│  │Dashboard │  │Interview │               │
+│  │          │  │   Prep   │               │
 │  └──────────┘  └──────────┘               │
 └──────┬─────────────────────────────────────┘
        │
@@ -76,12 +77,13 @@ OneProfile is a full-stack web application that helps users manage their profess
 ### 1. Frontend Components
 
 #### Main Pages/Views
-- **Dashboard**: Overview of user's profile, recent updates, quick actions
-- **Progress Update**: Form to submit new achievements in natural language
-- **Identity Vault**: View and manage all atomic profile entries (education, experience, skills)
-- **Resume Builder**: Interface to generate customized resumes based on job targets
-- **LinkedIn Assistant**: Display and copy LinkedIn update suggestions
-- **Interview Simulator**: Chat interface for AI-powered interview practice
+- **Dashboard**: Overview of user's profile, vault stats, quick actions
+- **Social Media Assistant**: Chat interface to submit progress updates, generate LinkedIn suggestions
+- **Identity Vault**: View and manage all atomic profile entries (education, experience, projects, skills, awards)
+- **Smart Resume Builder**: Interface to generate customized resumes based on job targets
+- **Interview Prep**: Chat interface for AI-powered interview practice
+- **Profile**: User personal information management
+- **Account Settings**: Privacy and preference settings
 
 #### State Management
 - User profile state
@@ -98,7 +100,10 @@ OneProfile is a full-stack web application that helps users manage their profess
 - **Identity Vault Routes**: 
   - `/api/education` (CRUD)
   - `/api/experience` (CRUD)
+  - `/api/projects` (CRUD)
   - `/api/skills` (CRUD)
+  - `/api/awards` (CRUD)
+  - GET `/api/vault/stats` - Get statistics for all entry types
 - **Progress Update Routes**: POST `/api/progress/update`
 - **LinkedIn Routes**: POST `/api/linkedin/generate`
 - **Resume Routes**: POST `/api/resume/generate`
@@ -137,10 +142,12 @@ OneProfile is a full-stack web application that helps users manage their profess
 
 #### Collections (MongoDB)
 1. **users**: User profile information
-2. **educationEntries**: Atomic education records
-3. **experienceEntries**: Atomic work/experience records
-4. **skillEntries**: Atomic skill records
-5. **progressUpdates**: Raw progress update history
+2. **educationEntries**: Atomic education records (degrees)
+3. **experienceEntries**: Atomic work/employment records (jobs)
+4. **projectEntries**: Atomic project records
+5. **skillEntries**: Atomic skill records
+6. **awardEntries**: Atomic award/achievement records
+7. **progressUpdates**: Raw progress update history
 
 See `identity-vault-schema.md` for detailed schema definitions.
 
@@ -295,10 +302,10 @@ AI generates final feedback and recommendations
 ## Technology Stack
 
 ### Frontend
-- **Framework**: React
-- **State Management**: (TBD - could use Context API, Redux, or Zustand)
-- **HTTP Client**: Fetch API or Axios
-- **Styling**: (TBD - CSS, Tailwind, Material-UI, etc.)
+- **Technology**: HTML, CSS, JavaScript
+- **HTTP Client**: Fetch API
+- **Styling**: Inline CSS and external stylesheets
+- **No Framework**: Pure HTML/CSS/JS implementation
 
 ### Backend
 - **Runtime**: Node.js
@@ -368,22 +375,21 @@ AI generates final feedback and recommendations
 
 ## Related Documents
 
-- `identity-vault-schema.md` - Detailed data models
-- `data-schema.md` - LinkedIn output formats
+- `identity-vault-schema.md` - Detailed Identity Vault data models
+- `linkedin-suggestions-schema.md` - LinkedIn suggestions output formats
+- `resume-generation-schema.md` - Resume generation data structures
+- `interview-schema.md` - Interview simulator data structures
 - `api-endpoints.md` - Complete API documentation
-- `ai-integration.md` - (To be created) AI prompt engineering details
-- `development-setup.md` - (To be created) Local setup instructions
 
 ---
 
 ## Next Steps
 
-1. **Implement Authentication**: Add user login/signup
-2. **Build AI Services**: Implement AI integration for each use case
-3. **Add Error Handling**: Comprehensive error handling across all routes
-4. **Add Logging**: Log important events and errors
-5. **Performance Optimization**: Optimize database queries and AI API calls
-6. **Testing**: Write tests for critical paths
+1. **Build AI Services**: Implement AI integration for each use case (Social Media, Resume, Interview)
+2. **Add Error Handling**: Comprehensive error handling across all routes
+3. **Add Logging**: Log important events and errors
+4. **Performance Optimization**: Optimize database queries and AI API calls
+5. **Testing**: Write tests for critical paths
 
 ---
 
