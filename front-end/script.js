@@ -120,7 +120,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const endDateInput = document.getElementById("inEndDate").value;
     const details = document.getElementById("inDetails").value.trim();
 
-    if (!title) return alert("Please enter a title");
+    // Task 6.3: Data validation
+    if (!title) {
+      alert("Please enter a title. Title is required.");
+      return;
+    }
+    
+    // Show loading state (Task 6.2)
+    const originalBtnText = confirmBtn.textContent;
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Adding...";
 
     // If we can't determine the type, use the old DOM-only method as fallback
     if (!activeEntryType) {
@@ -143,6 +152,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (placeholder) placeholder.remove();
       activeSectionBody.appendChild(newEntry);
       closeVaultModal();
+      // Restore button state before returning
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = originalBtnText;
       return;
     }
 
@@ -265,12 +277,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
         closeVaultModal();
       } else {
-        alert(`Error creating entry: ${result.message || "Unknown error"}`);
+        // Task 6.1: Better error handling
+        const errorMsg = result.message || "Unknown error occurred";
+        alert(`Failed to add entry: ${errorMsg}. Please check your input and try again.`);
       }
 
     } catch (error) {
       console.error("Error adding entry:", error);
-      alert("Failed to add entry. Please try again.");
+      // Task 6.1: Network error handling
+      if (error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
+        alert("Network error: Unable to connect to the server. Please check if the backend is running and try again.");
+      } else {
+        alert(`Failed to add entry: ${error.message || "An unexpected error occurred"}. Please try again.`);
+      }
+    } finally {
+      // Task 6.2: Restore button state
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = originalBtnText;
     }
   });
 
@@ -301,6 +324,11 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
         
+        // Task 6.2: Show loading state
+        const originalBtnText = button.textContent;
+        button.disabled = true;
+        button.textContent = "Deleting...";
+        
         // Map entry type to API endpoint
         const apiEndpoints = {
           "education": "/api/education",
@@ -314,6 +342,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!endpoint) {
           console.error(`Unknown entry type: ${entryType}`);
           entry.remove();
+          button.disabled = false;
+          button.textContent = originalBtnText;
           return;
         }
         
@@ -322,7 +352,12 @@ document.addEventListener("DOMContentLoaded", function () {
           method: "DELETE",
           headers: { "Content-Type": "application/json" }
         })
-          .then((res) => res.json())
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            return res.json();
+          })
           .then((data) => {
             if (data.status === "success") {
               // Remove from DOM
@@ -340,12 +375,23 @@ document.addEventListener("DOMContentLoaded", function () {
               const reloadFunc = reloadFunctions[entryType];
               if (reloadFunc) reloadFunc();
             } else {
-              alert(`Error deleting entry: ${data.message || "Unknown error"}`);
+              // Task 6.1: Better error handling
+              throw new Error(data.message || "Unknown error occurred");
             }
           })
           .catch((error) => {
             console.error("Error deleting entry:", error);
-            alert("Failed to delete entry. Please try again.");
+            // Task 6.1: Network error handling
+            if (error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
+              alert("Network error: Unable to connect to the server. Please check if the backend is running and try again.");
+            } else {
+              alert(`Failed to delete entry: ${error.message || "An unexpected error occurred"}. Please try again.`);
+            }
+          })
+          .finally(() => {
+            // Task 6.2: Restore button state
+            button.disabled = false;
+            button.textContent = originalBtnText;
           });
         
         return;
@@ -385,9 +431,15 @@ document.addEventListener("DOMContentLoaded", function () {
           const paragraphs = Array.from(entry.querySelectorAll("p"));
           const lists = Array.from(entry.querySelectorAll("ul"));
           
-          // Remove action buttons from text extraction
+          // Store action row before removing it
           const actionRow = entry.querySelector(".action-row");
+          const actionRowClone = actionRow ? actionRow.cloneNode(true) : null;
           if (actionRow) actionRow.remove();
+          
+          // Show loading state (Task 6.2)
+          const originalBtnText = button.textContent;
+          button.disabled = true;
+          button.textContent = "Saving...";
           
           // Extract text content from paragraphs (first p is usually title)
           const titleText = paragraphs[0] ? paragraphs[0].innerText.trim() : "";
@@ -414,6 +466,9 @@ document.addEventListener("DOMContentLoaded", function () {
           const endpoint = apiEndpoints[entryType];
           if (!endpoint) {
             alert(`Unknown entry type: ${entryType}`);
+            button.disabled = false;
+            button.textContent = originalBtnText;
+            if (actionRowClone) entry.appendChild(actionRowClone);
             return;
           }
           
@@ -480,7 +535,12 @@ document.addEventListener("DOMContentLoaded", function () {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updateData)
           })
-            .then((res) => res.json())
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+              }
+              return res.json();
+            })
             .then((data) => {
               if (data.status === "success") {
                 // Reload the section to show updated content
@@ -497,24 +557,24 @@ document.addEventListener("DOMContentLoaded", function () {
                   reloadFunc();
                 }
               } else {
-                alert(`Error updating entry: ${data.message || "Unknown error"}`);
-                // Restore editing state if error
-                entry.contentEditable = true;
-                entry.style.backgroundColor = "#fffdf0";
-                entry.style.outline = "1px dashed black";
-                button.innerText = "💾 Save";
-                if (actionRow) entry.appendChild(actionRow);
+                throw new Error(data.message || "Unknown error occurred");
               }
             })
             .catch((error) => {
               console.error("Error updating entry:", error);
-              alert("Failed to update entry. Please try again.");
+              // Task 6.1: Better error handling
+              let errorMsg = error.message || "An unexpected error occurred";
+              if (error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
+                errorMsg = "Network error: Unable to connect to the server. Please check if the backend is running on port 5001.";
+              }
+              alert(`Failed to update entry: ${errorMsg}. Please try again.`);
               // Restore editing state if error
               entry.contentEditable = true;
               entry.style.backgroundColor = "#fffdf0";
               entry.style.outline = "1px dashed black";
-              button.innerText = "💾 Save";
-              if (actionRow) entry.appendChild(actionRow);
+              button.textContent = "💾 Save";
+              button.disabled = false;
+              if (actionRowClone) entry.appendChild(actionRowClone);
             });
           
           return; // Exit early, reload will handle UI reset

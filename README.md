@@ -1,14 +1,14 @@
-# OneProfile
+# IdentityMaster
 
 **Update once. Sync everywhere.**
 
-OneProfile is an AI-powered career assistant that helps job seekers manage and synchronize their professional identity across LinkedIn, resumes, and interviews. Built at **UofTHacks 13**.
+IdentityMaster is an AI-powered career assistant that helps job seekers manage and synchronize their professional identity across LinkedIn, resumes, and interviews. Built at **UofTHacks 13**.
 
 ---
 
 ## 🎯 Overview
 
-OneProfile solves the problem of managing professional information across multiple platforms. Instead of manually updating LinkedIn, rewriting resume bullets, and preparing interview stories for each new achievement, users can **describe their progress once** in natural language. The system then:
+IdentityMaster solves the problem of managing professional information across multiple platforms. Instead of manually updating LinkedIn, rewriting resume bullets, and preparing interview stories for each new achievement, users can **describe their progress once** in natural language. The system then:
 
 - **Stores** progress as atomic, reusable components in the Identity Vault
 - **Generates** platform-specific content using AI
@@ -215,17 +215,43 @@ SkillProfile-UofTHacks13/
 
 3. **Set up environment variables**
    
-   Create a `.env` file in the `back-end` directory:
+   Copy the example environment file:
+   ```bash
+   cd back-end
+   cp .env.example .env
+   ```
+   
+   Edit `.env` and fill in your actual values:
    ```env
+   # MongoDB Connection String
+   # For local MongoDB: mongodb://localhost:27017/identitymaster
+   # For MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/identitymaster
    MONGO_URI=your_mongodb_connection_string
-   GEMINI_API_KEY=your_gemini_api_key  # Optional for now
+   
+   # Google Gemini API Key (Required for AI features)
+   # Get your API key from: https://aistudio.google.com/app/apikey
+   GEMINI_API_KEY=your_gemini_api_key
+   
+   # Node Environment
    NODE_ENV=development
+   
+   # Server Port (default: 5001)
+   PORT=5001
    ```
 
-   To get a MongoDB connection string:
-   - Sign up at [MongoDB Atlas](https://www.mongodb.com/atlas)
-   - Create a free cluster
-   - Get your connection string from "Connect" → "Connect your application"
+   **Getting your MongoDB connection string:**
+   - **Local MongoDB**: Use `mongodb://localhost:27017/identitymaster` if you have MongoDB installed locally
+   - **MongoDB Atlas** (Cloud - Recommended):
+     - Sign up at [MongoDB Atlas](https://www.mongodb.com/atlas)
+     - Create a free cluster
+     - Click "Connect" → "Connect your application"
+     - Copy the connection string and replace `<password>` with your database password
+   
+   **Getting your Gemini API key:**
+   - Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - Sign in with your Google account
+   - Click "Create API Key"
+   - Copy the generated key to your `.env` file
 
 4. **Start the backend server**
    ```bash
@@ -233,7 +259,7 @@ SkillProfile-UofTHacks13/
    node src/index.js
    ```
    
-   The server will start on `http://localhost:5000`
+   The server will start on `http://localhost:5001` (default port, configured in `.env`)
 
 5. **Open the frontend**
    
@@ -251,7 +277,7 @@ SkillProfile-UofTHacks13/
 
 ### Running the Application
 
-1. **Backend**: Must be running on port 5000
+1. **Backend**: Must be running on port 5001 (default, configured in `.env`)
    ```bash
    cd back-end
    node src/index.js
@@ -329,13 +355,13 @@ Currently, the application uses a hardcoded `DEMO_USER_ID` for single-user mode.
 **Test API directly:**
 ```bash
 # Get vault statistics
-curl http://localhost:5000/api/vault/stats
+curl http://localhost:5001/api/vault/stats
 
 # Get all education entries
-curl http://localhost:5000/api/education
+curl http://localhost:5001/api/education
 
 # Create a new education entry
-curl -X POST http://localhost:5000/api/education \
+curl -X POST http://localhost:5001/api/education \
   -H "Content-Type: application/json" \
   -d '{
     "institution": "University of Toronto",

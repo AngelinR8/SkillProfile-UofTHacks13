@@ -1,6 +1,6 @@
-# OneProfile 开发路线图
+# IdentityMaster 开发路线图
 
-> 本文档详细拆解了完成 OneProfile demo 所需的所有步骤。按顺序逐项完成，每完成一项可以在前面打 ✅。
+> 本文档详细拆解了完成 IdentityMaster demo 所需的所有步骤。按顺序逐项完成，每完成一项可以在前面打 ✅。
 
 ---
 

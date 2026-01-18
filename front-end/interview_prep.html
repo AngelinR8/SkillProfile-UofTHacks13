@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Interview Prep - OneProfile</title>
+    <title>Interview Prep - IdentityMaster</title>
     <style>
       * {
         margin: 0;
@@ -278,8 +278,15 @@
       }
 
       .user-message .message-avatar {
-        background-color: #4caf50;
-        color: white;
+        background-color: transparent;
+        padding: 0;
+        overflow: hidden;
+      }
+      
+      .user-message .message-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
       .chat-input-area {
@@ -393,7 +400,7 @@
   <body>
     <header>
       <div class="header-content">
-        <h1 style="cursor: pointer;" onclick="location.href = 'dashboard.html'">OneProfile</h1>
+        <h1 style="cursor: pointer;" onclick="location.href = 'dashboard.html'">IdentityMaster</h1>
         <div class="header-right">
           <span class="settings-icon" onclick="location.href = 'account_settings.html'">⚙️</span>
           <div class="profile-nav">
@@ -523,6 +530,7 @@
       let interviewStarted = false;
       let interviewEnded = false;
       let messageCount = 0;
+      let currentSessionId = null;
 
       // DOM Elements
       const jobDescriptionCard = document.getElementById("jobDescriptionCard");
@@ -536,32 +544,114 @@
       const endSessionBtn = document.getElementById("endSessionBtn");
       const feedbackCard = document.getElementById("feedbackCard");
 
-      // Initialize interview with example AI greeting
-      function startInterview() {
-        const jobDescription = jobDescriptionInput.value.trim();
-        if (!jobDescription) {
+      // Start interview - Task 5.5: Call POST /api/interview/start
+      async function startInterview() {
+        const jobDescriptionText = jobDescriptionInput.value.trim();
+        if (!jobDescriptionText) {
           alert("Please enter a job description before starting the interview.");
           return;
         }
 
-        interviewStarted = true;
-        interviewEnded = false;
-        messageCount = 0;
+        // Parse job description
+        const lines = jobDescriptionText.split('\n');
+        let company = "";
+        let position = "";
+        let requirements = "";
 
-        // Hide job description card and show chat
-        jobDescriptionCard.style.display = "none";
-        interviewChatCard.classList.add("active");
+        lines.forEach(line => {
+          const lowerLine = line.toLowerCase().trim();
+          if (lowerLine.startsWith("company:")) {
+            company = line.split(":").slice(1).join(":").trim();
+          } else if (lowerLine.startsWith("position:")) {
+            position = line.split(":").slice(1).join(":").trim();
+          } else if (lowerLine.startsWith("responsibilities:") || lowerLine.startsWith("requirements:")) {
+            requirements = line.split(":").slice(1).join(":").trim();
+          } else if (requirements === "" && line.trim()) {
+            if (company && position) {
+              requirements = (requirements ? requirements + "\n" : "") + line.trim();
+            }
+          }
+        });
 
-        // Clear previous messages
-        chatMessages.innerHTML = "";
+        // Fallback parsing
+        if (!company || !position) {
+          const firstLine = lines[0]?.trim();
+          const secondLine = lines[1]?.trim();
+          if (firstLine && secondLine) {
+            if (!company) company = firstLine;
+            if (!position) position = secondLine;
+            if (!requirements) requirements = lines.slice(2).join('\n').trim();
+          } else {
+            company = "Unknown";
+            position = "Unknown";
+            requirements = jobDescriptionText;
+          }
+        }
 
-        // Add initial AI greeting
-        addAIMessage(
-          `Hello Alex! I'll be conducting your interview for the position you described. Based on your Identity Vault, I can see your relevant experience. Let's begin. Can you tell me about a challenging technical project you've worked on?`
-        );
+        if (!requirements) {
+          requirements = "Not specified";
+        }
 
-        // Focus on chat input
-        chatInput.focus();
+        // Show loading state
+        startInterviewBtn.disabled = true;
+        startInterviewBtn.textContent = "Starting...";
+
+        try {
+          // Call POST /api/interview/start
+          const response = await fetch("http://localhost:5001/api/interview/start", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              company: company,
+              position: position,
+              requirements: requirements
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.status === "success") {
+            currentSessionId = data.sessionId;
+            interviewStarted = true;
+            interviewEnded = false;
+            messageCount = 0;
+
+            // Hide job description card and show chat
+            jobDescriptionCard.style.display = "none";
+            interviewChatCard.classList.add("active");
+
+            // Clear previous messages
+            chatMessages.innerHTML = "";
+
+            // Add first question from AI
+            addAIMessage(data.question);
+
+            // Focus on chat input
+            chatInput.focus();
+          } else {
+            throw new Error(data.message || "Failed to start interview");
+          }
+        } catch (error) {
+          console.error("Error starting interview:", error);
+          // Task 6.1: Better error handling for specific cases
+          let errorMessage = error.message || "An unexpected error occurred";
+          
+          // Check for API quota errors
+          if (errorMessage.includes("429") || errorMessage.includes("quota") || errorMessage.includes("Quota exceeded")) {
+            errorMessage = "AI service quota exceeded. The free tier limit has been reached. Please wait a moment and try again later, or check your Gemini API quota at https://ai.google.dev/";
+          } else if (errorMessage.includes("Failed to fetch") || errorMessage.includes("network")) {
+            errorMessage = "Network error: Unable to connect to the server. Please check if the backend is running on port 5001.";
+          } else if (errorMessage.includes("Failed to parse AI response")) {
+            errorMessage = "AI service error: The AI service returned an invalid response. This might be due to quota limits or service issues. Please try again later.";
+          }
+          
+          alert(`Failed to start interview: ${errorMessage}`);
+        } finally {
+          startInterviewBtn.disabled = false;
+          startInterviewBtn.textContent = "Start Interview Session";
+        }
       }
 
       // Add AI message to chat
@@ -587,7 +677,9 @@
         messageDiv.className = "message user-message";
         const timeAgo = getTimeAgo();
         messageDiv.innerHTML = `
-          <div class="message-avatar">👤</div>
+          <div class="message-avatar">
+            <img src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg" alt="User avatar" />
+          </div>
           <div class="message-content">
             <div class="message-sender">You:</div>
             <div class="message-text">${text}</div>
@@ -606,31 +698,57 @@
         return "Just now";
       }
 
-      // Send user message
-      function sendMessage() {
+      // Send user message - Task 5.6: Call POST /api/interview/message
+      async function sendMessage() {
         const message = chatInput.value.trim();
-        if (!message) return;
+        if (!message || !interviewStarted || interviewEnded) return;
+
+        if (!currentSessionId) {
+          alert("Session not found. Please start a new interview.");
+          return;
+        }
 
         addUserMessage(message);
         chatInput.value = "";
+        chatInput.disabled = true;
+        sendMessageBtn.disabled = true;
+        sendMessageBtn.textContent = "Processing...";
 
-        // Simulate AI response (in real implementation, this would call the API)
-        setTimeout(() => {
-          const responses = [
-            "Interesting! What specific algorithms did you use and why did you choose them?",
-            "That's a great example. Can you tell me more about how you handled any challenges you faced?",
-            "I see. How would you approach a similar problem if you had to do it again?",
-            "Excellent. Now, let's talk about system design. How would you design a distributed caching system?",
-            "Good point. What would you do differently if you had more time?",
-          ];
-          const randomResponse =
-            responses[Math.floor(Math.random() * responses.length)];
-          addAIMessage(randomResponse);
-        }, 1000);
+        try {
+          // Call POST /api/interview/message
+          const response = await fetch("http://localhost:5001/api/interview/message", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sessionId: currentSessionId,
+              userResponse: message
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.status === "success") {
+            // Add AI's next question
+            addAIMessage(data.question);
+            messageCount++;
+          } else {
+            throw new Error(data.message || "Failed to get next question");
+          }
+        } catch (error) {
+          console.error("Error sending message:", error);
+          addAIMessage(`I apologize, but I encountered an error processing your response. Please try again or end the session.`);
+        } finally {
+          chatInput.disabled = false;
+          sendMessageBtn.disabled = false;
+          sendMessageBtn.textContent = "Send →";
+          chatInput.focus();
+        }
       }
 
-      // End interview session
-      function endSession() {
+      // End interview session - Task 5.7: Call POST /api/interview/end
+      async function endSession() {
         if (!interviewStarted) return;
 
         if (
@@ -638,18 +756,64 @@
             "Are you sure you want to end the interview session? You will receive feedback based on your responses."
           )
         ) {
+          if (!currentSessionId) {
+            alert("Session not found. Please start a new interview.");
+            return;
+          }
+
           interviewEnded = true;
-          interviewChatCard.classList.remove("active");
-          showFeedback();
+          chatInput.disabled = true;
+          sendMessageBtn.disabled = true;
+          endSessionBtn.disabled = true;
+          endSessionBtn.textContent = "Processing...";
+
+          try {
+            // Call POST /api/interview/end
+            const response = await fetch("http://localhost:5001/api/interview/end", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                sessionId: currentSessionId
+              }),
+            });
+
+            const data = await response.json();
+
+            if (data.status === "success" && data.feedback) {
+              interviewChatCard.classList.remove("active");
+              showFeedback(data.feedback);
+            } else {
+              throw new Error(data.message || "Failed to get feedback");
+            }
+          } catch (error) {
+            console.error("Error ending session:", error);
+            alert(`Failed to end interview: ${error.message}. Please try again.`);
+            interviewEnded = false;
+            chatInput.disabled = false;
+            sendMessageBtn.disabled = false;
+            endSessionBtn.disabled = false;
+            endSessionBtn.textContent = "End Session";
+          }
         }
       }
 
-      // Show feedback card
-      function showFeedback() {
+      // Show feedback card - Task 5.7: Display real feedback from API
+      function showFeedback(feedbackData) {
         feedbackCard.classList.add("active");
 
-        // Generate sample feedback
-        const rating = 4;
+        if (!feedbackData) {
+          // Fallback to sample feedback if no data provided
+          feedbackData = {
+            overallScore: 4,
+            strengths: ["Strong technical foundation", "Good communication"],
+            areasForImprovement: ["Could elaborate more", "Practice STAR method"],
+            recommendations: ["Review concepts", "Prepare examples"]
+          };
+        }
+
+        const rating = Math.round(feedbackData.overallScore || 0);
         const ratingStarsHtml = Array(5)
           .fill(0)
           .map((_, i) => {
@@ -662,23 +826,38 @@
           .join("");
 
         document.getElementById("ratingStars").innerHTML = ratingStarsHtml;
-        document.getElementById("ratingText").textContent = `(${rating}/5)`;
+        document.getElementById("ratingText").textContent = `(${feedbackData.overallScore?.toFixed(1) || rating}/5)`;
 
-        document.getElementById("strengthsList").innerHTML = `
-          <li>Strong technical foundation in algorithms</li>
-          <li>Good communication of complex concepts</li>
-          <li>Relevant project experience demonstrated</li>
-        `;
+        // Display strengths
+        const strengthsList = document.getElementById("strengthsList");
+        if (strengthsList && feedbackData.strengths && feedbackData.strengths.length > 0) {
+          strengthsList.innerHTML = feedbackData.strengths.map(strength => `<li>${strength}</li>`).join("");
+        } else if (strengthsList) {
+          strengthsList.innerHTML = "<li>No specific strengths identified</li>";
+        }
 
-        document.getElementById("improvementsList").innerHTML = `
-          <li>Could elaborate more on system design decisions</li>
-          <li>Practice STAR method for behavioral questions</li>
-        `;
+        // Display areas for improvement
+        const improvementsList = document.getElementById("improvementsList");
+        if (improvementsList && feedbackData.areasForImprovement && feedbackData.areasForImprovement.length > 0) {
+          improvementsList.innerHTML = feedbackData.areasForImprovement.map(area => `<li>${area}</li>`).join("");
+        } else if (improvementsList) {
+          improvementsList.innerHTML = "<li>No specific areas for improvement identified</li>";
+        }
 
-        document.getElementById("actionsList").innerHTML = `
-          <li>Review distributed systems concepts</li>
-          <li>Prepare 2-3 more behavioral examples</li>
-        `;
+        // Display recommendations
+        const actionsList = document.getElementById("actionsList");
+        if (actionsList && feedbackData.recommendations && feedbackData.recommendations.length > 0) {
+          actionsList.innerHTML = feedbackData.recommendations.map(rec => `<li>${rec}</li>`).join("");
+        } else if (actionsList) {
+          actionsList.innerHTML = "<li>No specific recommendations</li>";
+        }
+
+        // Display breakdown if available
+        if (feedbackData.breakdown) {
+          const breakdown = feedbackData.breakdown;
+          // You can add breakdown display here if needed
+          console.log("Score breakdown:", breakdown);
+        }
       }
 
       // Save feedback
@@ -691,11 +870,16 @@
         interviewStarted = false;
         interviewEnded = false;
         messageCount = 0;
+        currentSessionId = null;
         jobDescriptionInput.value = "";
         jobDescriptionCard.style.display = "block";
         interviewChatCard.classList.remove("active");
         feedbackCard.classList.remove("active");
         chatMessages.innerHTML = "";
+        chatInput.disabled = false;
+        sendMessageBtn.disabled = false;
+        endSessionBtn.disabled = false;
+        endSessionBtn.textContent = "End Session";
         jobDescriptionInput.focus();
       }
 

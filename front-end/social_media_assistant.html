@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Social Media Assistant - OneProfile</title>
+    <title>Social Media Assistant - IdentityMaster</title>
     <style>
       * {
         margin: 0;
@@ -168,8 +168,15 @@
       }
 
       .user-message .message-avatar {
-        background-color: #4caf50;
-        color: white;
+        background-color: transparent;
+        padding: 0;
+        overflow: hidden;
+      }
+      
+      .user-message .message-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
       .examples-section {
@@ -445,7 +452,7 @@
   <body>
     <header>
       <div class="header-content">
-        <h1 style="cursor: pointer;" onclick="location.href = 'dashboard.html'">OneProfile</h1>
+        <h1 style="cursor: pointer;" onclick="location.href = 'dashboard.html'">IdentityMaster</h1>
         <div class="header-right">
           <span class="settings-icon" onclick="location.href = 'account_settings.html'">⚙️</span>
           <div class="profile-nav">
@@ -546,7 +553,7 @@
               <div id="postsSuggestions">
                 <div class="suggestion-card">
                   <div class="suggestion-title">Suggested Post:</div>
-                  <div class="suggestion-content">🎉 Excited to share that our team won Best Use of Gemini API at UofTHacks! Over 36 hours, we built OneProfile - an AI-powered career assistant using React, Google&apos;s Gemini API, and MongoDB. This experience taught me so much about prompt engineering and rapid prototyping. Huge thanks to my amazing teammates and the UofTHacks organizers! 🚀
+                  <div class="suggestion-content">🎉 Excited to share that our team won Best Use of Gemini API at UofTHacks! Over 36 hours, we built IdentityMaster - an AI-powered career assistant using React, Google&apos;s Gemini API, and MongoDB. This experience taught me so much about prompt engineering and rapid prototyping. Huge thanks to my amazing teammates and the UofTHacks organizers! 🚀
 
 #UofTHacks #AI #Hackathon #GeminiAPI</div>
                   <div>
@@ -634,12 +641,12 @@ Relevant Coursework:
               <div id="experienceSuggestions">
                 <div class="suggestion-card">
                   <div class="suggestion-title">Suggested Project to Add:</div>
-                  <div class="suggestion-content">Project Name: OneProfile - AI Career Assistant
+                  <div class="suggestion-content">Project Name: IdentityMaster - AI Career Assistant
 Date: Jan 2026
 Description: Built an AI-powered platform that helps job seekers manage their professional identity. Integrated Google's Gemini API for intelligent content generation and MongoDB for data storage. Won Best Use of Gemini API at UofTHacks 2026.
 Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev</div>
                   <div>
-                    <button class="copy-button" onclick="copyToClipboard(this, 'OneProfile - AI Career Assistant')">📄 Copy Project Title</button>
+                    <button class="copy-button" onclick="copyToClipboard(this, 'IdentityMaster - AI Career Assistant')">📄 Copy Project Title</button>
                     <button class="copy-button" onclick="copyProjectDescription(this)">📄 Copy Description</button>
                     <button class="copy-button" onclick="copyToClipboard(this, 'React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev')">📄 Copy Skills</button>
                     <button class="copy-button" onclick="copyAllProject(this)">📄 Copy Everything</button>
@@ -714,7 +721,9 @@ Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev</d
         const messageDiv = document.createElement("div");
         messageDiv.className = "message user-message";
         messageDiv.innerHTML = `
-          <div class="message-avatar">👤</div>
+          <div class="message-avatar">
+            <img src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg" alt="User avatar" />
+          </div>
           <div class="message-content">
             <div class="message-sender">You:</div>
             <div class="message-text">${text}</div>
@@ -746,34 +755,209 @@ Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev</d
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
 
-      // Generate sample suggestions based on user input
-      function generateSuggestions(userInput) {
-        const lowerInput = userInput.toLowerCase();
-        
-        // Simple keyword detection for demo
-        if (lowerInput.includes("hackathon") || lowerInput.includes("won")) {
-          suggestionCount.posts = 1;
-          suggestionCount.skills = 3;
-          suggestionCount.experience = 1;
-          
-          // Show suggestions
-          showPostsSuggestion();
-          showSkillsSuggestions();
-          showExperienceSuggestion();
-          updateModuleHeader();
-        } else if (lowerInput.includes("internship") || lowerInput.includes("job")) {
-          suggestionCount.experience = 1;
-          showExperienceSuggestion();
-          updateModuleHeader();
-        } else if (lowerInput.includes("learn") || lowerInput.includes("skill")) {
-          suggestionCount.skills = 2;
-          showSkillsSuggestions();
-          updateModuleHeader();
-        } else if (lowerInput.includes("degree") || lowerInput.includes("graduate")) {
-          suggestionCount.education = 1;
-          showEducationSuggestion();
-          updateModuleHeader();
+      // Load LinkedIn suggestions - Task 3.7: Call GET /api/linkedin/suggestions
+      async function loadLinkedInSuggestions() {
+        try {
+          const response = await fetch("http://localhost:5001/api/linkedin/suggestions");
+          const data = await response.json();
+
+          if (data.status === "success" && data.suggestions) {
+            const suggestions = data.suggestions;
+            
+            // Reset suggestion counts
+            suggestionCount = {
+              posts: 0,
+              education: 0,
+              skills: 0,
+              experience: 0,
+            };
+
+            // Update Posts tab
+            if (suggestions.post && suggestions.post.shouldUpdate) {
+              suggestionCount.posts = 1;
+              updatePostsTab(suggestions.post);
+              document.getElementById("postsNewBadge").style.display = "inline-block";
+            } else {
+              updatePostsTab(null);
+              document.getElementById("postsNewBadge").style.display = "none";
+            }
+
+            // Update Education tab
+            if (suggestions.education && suggestions.education.shouldUpdate) {
+              suggestionCount.education = 1;
+              updateEducationTab(suggestions.education);
+              document.getElementById("educationNewBadge").style.display = "inline-block";
+            } else {
+              updateEducationTab(null);
+              document.getElementById("educationNewBadge").style.display = "none";
+            }
+
+            // Update Skills tab
+            if (suggestions.skills && suggestions.skills.shouldUpdate) {
+              suggestionCount.skills = suggestions.skills.add?.length || 0;
+              updateSkillsTab(suggestions.skills);
+              document.getElementById("skillsNewBadge").style.display = "inline-block";
+            } else {
+              updateSkillsTab(null);
+              document.getElementById("skillsNewBadge").style.display = "none";
+            }
+
+            // Update Experience tab
+            if (suggestions.position && suggestions.position.shouldUpdate) {
+              suggestionCount.experience = 1;
+              updateExperienceTab(suggestions.position);
+              document.getElementById("experienceNewBadge").style.display = "inline-block";
+            } else {
+              updateExperienceTab(null);
+              document.getElementById("experienceNewBadge").style.display = "none";
+            }
+
+            // Update module header
+            updateModuleHeader();
+          } else {
+            console.error("Failed to load LinkedIn suggestions:", data);
+          }
+        } catch (error) {
+          console.error("Error loading LinkedIn suggestions:", error);
         }
+      }
+
+      // Update Posts tab
+      function updatePostsTab(postSuggestion) {
+        const container = document.getElementById("postsSuggestions");
+        if (!postSuggestion) {
+          container.innerHTML = `
+            <div class="suggestion-card">
+              <div class="suggestion-content" style="color: #666; font-style: italic;">
+                No post update needed at this time.
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const content = postSuggestion.content || "";
+        const hashtags = (postSuggestion.suggestedHashtags || []).map(tag => tag.startsWith("#") ? tag : `#${tag}`).join(" ");
+        const fullPost = hashtags ? `${content}\n\n${hashtags}` : content;
+
+        container.innerHTML = `
+          <div class="suggestion-card">
+            <div class="suggestion-title">Suggested Post:</div>
+            <div class="suggestion-content">${fullPost.replace(/\n/g, "<br>")}</div>
+            <div>
+              <button class="copy-button" onclick="copyPostContentFromSuggestion(this, \`${fullPost.replace(/`/g, "\\`").replace(/\${/g, "\\${")}\`)">📄 Copy Post</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Update Education tab
+      function updateEducationTab(educationSuggestion) {
+        const container = document.getElementById("educationSuggestions");
+        if (!educationSuggestion || !educationSuggestion.suggestedEntry) {
+          container.innerHTML = `
+            <div class="suggestion-card">
+              <div class="suggestion-content" style="color: #666; font-style: italic;">
+                No education update needed at this time.
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const entry = educationSuggestion.suggestedEntry;
+        const content = `Institution: ${entry.institution || "N/A"}
+Program: ${entry.program || "N/A"}
+Duration: ${entry.duration || "N/A"}
+Description: ${entry.description || ""}`;
+
+        container.innerHTML = `
+          <div class="suggestion-card">
+            <div class="suggestion-title">Suggested Education Update:</div>
+            <div class="suggestion-content">${content.replace(/\n/g, "<br>")}</div>
+            <div>
+              <button class="copy-button" onclick="copyAllEducationFromSuggestion(this, \`${content.replace(/`/g, "\\`")}\`)">📄 Copy Education Info</button>
+            </div>
+            <div class="tip-box">
+              💡 Tip: Go to LinkedIn → Education section and paste this information
+            </div>
+          </div>
+        `;
+      }
+
+      // Update Skills tab
+      function updateSkillsTab(skillsSuggestion) {
+        const container = document.getElementById("skillsSuggestions");
+        if (!skillsSuggestion || !skillsSuggestion.add || skillsSuggestion.add.length === 0) {
+          container.innerHTML = `
+            <div class="suggestion-card">
+              <div class="suggestion-content" style="color: #666; font-style: italic;">
+                No skills update needed at this time.
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const skillsList = skillsSuggestion.add.map(skill => {
+          const escapedSkill = skill.replace(/'/g, "&apos;");
+          return `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; background: white;">
+              <div>
+                <strong>${skill}</strong>
+                <span style="background: #ffd700; color: #333; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 8px;">NEW!</span>
+              </div>
+              <button class="copy-button" onclick="copyToClipboard(this, '${escapedSkill}')">📄 Copy Skill Name</button>
+            </div>
+          `;
+        }).join("");
+
+        const allSkills = skillsSuggestion.add.join("\n");
+        const escapedAllSkills = allSkills.replace(/'/g, "&apos;");
+
+        container.innerHTML = `
+          <div class="suggestion-card">
+            <div class="suggestion-title">Suggested Skills to Add:</div>
+            <div style="margin: 15px 0;">
+              ${skillsList}
+            </div>
+            <button class="copy-button" onclick="copyAllSkillsFromSuggestion(this, \`${escapedAllSkills}\`)">📄 Copy All Skills</button>
+            <div class="tip-box">
+              💡 Tip: Go to LinkedIn → Skills section and add these skills manually
+            </div>
+          </div>
+        `;
+      }
+
+      // Update Experience tab
+      function updateExperienceTab(positionSuggestion) {
+        const container = document.getElementById("experienceSuggestions");
+        if (!positionSuggestion) {
+          container.innerHTML = `
+            <div class="suggestion-card">
+              <div class="suggestion-content" style="color: #666; font-style: italic;">
+                No experience update needed at this time.
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const content = `Role: ${positionSuggestion.targetRole || "N/A"}
+Suggested Bullet: ${positionSuggestion.suggestedBullet || ""}`;
+
+        container.innerHTML = `
+          <div class="suggestion-card">
+            <div class="suggestion-title">Suggested Position Update:</div>
+            <div class="suggestion-content">${content.replace(/\n/g, "<br>")}</div>
+            <div>
+              <button class="copy-button" onclick="copyAllExperienceFromSuggestion(this, \`${content.replace(/`/g, "\\`")}\`)">📄 Copy Experience Info</button>
+            </div>
+            <div class="tip-box">
+              💡 Tip: Go to LinkedIn → Experience section and update your role with this bullet point
+            </div>
+          </div>
+        `;
       }
 
       // Show posts suggestion
@@ -782,7 +966,7 @@ Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev</d
         container.innerHTML = `
           <div class="suggestion-card">
             <div class="suggestion-title">Suggested Post:</div>
-            <div class="suggestion-content">🎉 Excited to share that our team won Best Use of Gemini API at UofTHacks! Over 36 hours, we built OneProfile - an AI-powered career assistant using React, Google's Gemini API, and MongoDB. This experience taught me so much about prompt engineering and rapid prototyping. Huge thanks to my amazing teammates and the UofTHacks organizers! 🚀
+            <div class="suggestion-content">🎉 Excited to share that our team won Best Use of Gemini API at UofTHacks! Over 36 hours, we built IdentityMaster - an AI-powered career assistant using React, Google's Gemini API, and MongoDB. This experience taught me so much about prompt engineering and rapid prototyping. Huge thanks to my amazing teammates and the UofTHacks organizers! 🚀
 
 #UofTHacks #AI #Hackathon #GeminiAPI</div>
             <div>
@@ -838,12 +1022,12 @@ Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev</d
         container.innerHTML = `
           <div class="suggestion-card">
             <div class="suggestion-title">Suggested Project to Add:</div>
-            <div class="suggestion-content">Project Name: OneProfile - AI Career Assistant
+            <div class="suggestion-content">Project Name: IdentityMaster - AI Career Assistant
 Date: Jan 2026
 Description: Built an AI-powered platform that helps job seekers manage their professional identity. Integrated Google's Gemini API for intelligent content generation and MongoDB for data storage. Won Best Use of Gemini API at UofTHacks 2026.
 Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev</div>
             <div>
-              <button class="copy-button" onclick="copyToClipboard(this, 'OneProfile - AI Career Assistant')">📄 Copy Project Title</button>
+              <button class="copy-button" onclick="copyToClipboard(this, 'IdentityMaster - AI Career Assistant')">📄 Copy Project Title</button>
               <button class="copy-button" onclick="copyProjectDescription(this)">📄 Copy Description</button>
               <button class="copy-button" onclick="copyToClipboard(this, 'React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev')">📄 Copy Skills</button>
               <button class="copy-button" onclick="copyAllProject(this)">📄 Copy Everything</button>
@@ -907,9 +1091,14 @@ Relevant Coursework:
         });
       }
 
-      // Copy post content
+      // Copy post content (from suggestion)
+      function copyPostContentFromSuggestion(button, postText) {
+        copyToClipboard(button, postText);
+      }
+
+      // Copy post content (legacy, for hardcoded content)
       function copyPostContent(button) {
-        const postText = "🎉 Excited to share that our team won Best Use of Gemini API at UofTHacks! Over 36 hours, we built OneProfile - an AI-powered career assistant using React, Google's Gemini API, and MongoDB. This experience taught me so much about prompt engineering and rapid prototyping. Huge thanks to my amazing teammates and the UofTHacks organizers! 🚀\n\n#UofTHacks #AI #Hackathon #GeminiAPI";
+        const postText = "🎉 Excited to share that our team won Best Use of Gemini API at UofTHacks! Over 36 hours, we built IdentityMaster - an AI-powered career assistant using React, Google's Gemini API, and MongoDB. This experience taught me so much about prompt engineering and rapid prototyping. Huge thanks to my amazing teammates and the UofTHacks organizers! 🚀\n\n#UofTHacks #AI #Hackathon #GeminiAPI";
         copyToClipboard(button, postText);
       }
 
@@ -927,14 +1116,19 @@ Relevant Coursework:
 
       // Copy all project
       function copyAllProject(button) {
-        const project = `Project: OneProfile - AI Career Assistant
+        const project = `Project: IdentityMaster - AI Career Assistant
 Date: Jan 2026
 Built an AI-powered platform that helps job seekers manage their professional identity. Integrated Google's Gemini API for intelligent content generation and MongoDB for data storage. Won Best Use of Gemini API at UofTHacks 2026.
 Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Development`;
         copyToClipboard(button, project);
       }
 
-      // Copy all education
+      // Copy all education (from suggestion)
+      function copyAllEducationFromSuggestion(button, education) {
+        copyToClipboard(button, education);
+      }
+
+      // Copy all education (legacy, for hardcoded content)
       function copyAllEducation(button) {
         const education = `University: University of Toronto
 Degree: Bachelor of Science - Computer Science
@@ -949,21 +1143,74 @@ Relevant Coursework:
         copyToClipboard(button, education);
       }
 
-      // Send message
-      function sendMessage() {
+      // Copy all skills (from suggestion)
+      function copyAllSkillsFromSuggestion(button, skills) {
+        copyToClipboard(button, skills);
+      }
+
+      // Copy all experience (from suggestion)
+      function copyAllExperienceFromSuggestion(button, experience) {
+        copyToClipboard(button, experience);
+      }
+
+      // Send message - Task 3.6: Call POST /api/progress/update
+      async function sendMessage() {
         const message = chatInput.value.trim();
         if (!message) return;
 
         addUserMessage(message);
         chatInput.value = "";
 
-        // Simulate AI response
-        setTimeout(() => {
+        // Show loading state
+        addAIMessage("Processing your progress update... This may take a few seconds.");
+
+        try {
+          // Call POST /api/progress/update
+          const response = await fetch("http://localhost:5001/api/progress/update", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ rawText: message }),
+          });
+
+          const data = await response.json();
+
+          if (data.status === "success") {
+            // Remove loading message
+            const messages = chatMessages.querySelectorAll(".message");
+            if (messages.length > 0 && messages[messages.length - 1].querySelector(".message-text").textContent.includes("Processing")) {
+              messages[messages.length - 1].remove();
+            }
+
+            // Show success message
+            const createdCount = data.createdEntries || {};
+            const totalCreated = (createdCount.education || 0) + 
+                                (createdCount.experience || 0) + 
+                                (createdCount.projects || 0) + 
+                                (createdCount.skills || 0) + 
+                                (createdCount.awards || 0);
+            
+            addAIMessage(
+              `Great! I've analyzed your progress update. I've extracted ${totalCreated} new entry/entries and generated LinkedIn suggestions for you. Check the Platform Modules section below!`
+            );
+
+            // Load LinkedIn suggestions
+            await loadLinkedInSuggestions();
+          } else {
+            throw new Error(data.message || "Failed to process progress update");
+          }
+        } catch (error) {
+          console.error("Error sending message:", error);
+          // Remove loading message
+          const messages = chatMessages.querySelectorAll(".message");
+          if (messages.length > 0 && messages[messages.length - 1].querySelector(".message-text").textContent.includes("Processing")) {
+            messages[messages.length - 1].remove();
+          }
           addAIMessage(
-            "Great! I've analyzed your update and generated LinkedIn suggestions for you. Check the Platform Modules section below!"
+            `Sorry, I encountered an error processing your update: ${error.message}. Please try again.`
           );
-          generateSuggestions(message);
-        }, 1000);
+        }
       }
 
       // Toggle LinkedIn module

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Resume Builder - OneProfile</title>
+    <title>Smart Resume Builder - IdentityMaster</title>
     <style>
       * {
         margin: 0;
@@ -198,7 +198,7 @@
       }
 
       .resume-name {
-        text-align: center;
+        text-align: left;
         font-size: 20px;
         font-weight: bold;
         margin-bottom: 10px;
@@ -206,14 +206,14 @@
       }
 
       .resume-contact {
-        text-align: center;
+        text-align: left;
         font-size: 12px;
         margin-bottom: 8px;
         color: #333;
       }
 
       .resume-summary {
-        text-align: center;
+        text-align: left;
         font-size: 12px;
         margin-top: 10px;
         line-height: 1.5;
@@ -357,7 +357,7 @@
   <body>
     <header>
       <div class="header-content">
-        <h1 style="cursor: pointer;" onclick="location.href = 'dashboard.html'">OneProfile</h1>
+        <h1 style="cursor: pointer;" onclick="location.href = 'dashboard.html'">IdentityMaster</h1>
         <div class="header-right">
           <span class="settings-icon" onclick="location.href = 'account_settings.html'">⚙️</span>
           <div class="profile-nav">
@@ -544,26 +544,251 @@
       const skillsSection = document.getElementById("skillsSection");
       const resumeSummary = document.getElementById("resumeSummary");
 
-      // Generate tailored resume based on job description
-      function generateResume() {
-        const jobDescription = jobDescriptionInput.value.trim();
-        if (!jobDescription) {
+      // Generate tailored resume based on job description - Task 4.3 & 4.4
+      async function generateResume() {
+        const jobDescriptionText = jobDescriptionInput.value.trim();
+        if (!jobDescriptionText) {
           alert("Please enter a job description before generating the resume.");
           return;
         }
 
-        // In real implementation, this would call the AI API to tailor the resume
-        // For now, we'll display the resume with sample data
-        displayResume();
+        // Parse job description to extract company, position, requirements
+        const lines = jobDescriptionText.split('\n');
+        let company = "";
+        let position = "";
+        let requirements = "";
 
-        // Show preview and actions
+        lines.forEach(line => {
+          const lowerLine = line.toLowerCase().trim();
+          if (lowerLine.startsWith("company:")) {
+            company = line.split(":").slice(1).join(":").trim();
+          } else if (lowerLine.startsWith("position:")) {
+            position = line.split(":").slice(1).join(":").trim();
+          } else if (lowerLine.startsWith("requirements:") || lowerLine.startsWith("requirement:")) {
+            requirements = line.split(":").slice(1).join(":").trim();
+          } else if (requirements === "" && line.trim()) {
+            // If no "Requirements:" label, treat remaining text as requirements
+            if (company && position) {
+              requirements = (requirements ? requirements + "\n" : "") + line.trim();
+            }
+          }
+        });
+
+        // Fallback: if no structured format, try to extract from text
+        if (!company || !position) {
+          // Simple parsing: assume first line is company, second is position, rest is requirements
+          const firstLine = lines[0]?.trim();
+          const secondLine = lines[1]?.trim();
+          if (firstLine && secondLine) {
+            if (!company) company = firstLine;
+            if (!position) position = secondLine;
+            if (!requirements) requirements = lines.slice(2).join('\n').trim();
+          } else {
+            // If still not found, use whole text as requirements
+            company = "Unknown";
+            position = "Unknown";
+            requirements = jobDescriptionText;
+          }
+        }
+
+        if (!requirements) {
+          requirements = "Not specified";
+        }
+
+        // Show loading state
+        generateResumeBtn.disabled = true;
+        generateResumeBtn.textContent = "Generating...";
+        
+        // Show preview card with loading state
         resumePreviewCard.classList.add("active");
-        resumeActions.classList.add("active");
+        resumeActions.classList.remove("active");
+        educationSection.innerHTML = "<div style='padding: 20px; text-align: center; color: #666;'>Generating resume... This may take 3-5 seconds.</div>";
+        experienceSection.innerHTML = "";
+        skillsSection.innerHTML = "";
+
+        try {
+          // Call POST /api/resume/generate
+          const response = await fetch("http://localhost:5001/api/resume/generate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              company: company,
+              position: position,
+              requirements: requirements
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.status === "success" && data.resume) {
+            // Display the generated resume
+            displayResume(data.resume);
+            resumeActions.classList.add("active");
+          } else {
+            throw new Error(data.message || "Failed to generate resume");
+          }
+        } catch (error) {
+          console.error("Error generating resume:", error);
+          educationSection.innerHTML = `<div style='padding: 20px; text-align: center; color: #d32f2f;'>Error: ${error.message}. Please try again.</div>`;
+          resumePreviewCard.classList.add("active");
+        } finally {
+          generateResumeBtn.disabled = false;
+          generateResumeBtn.textContent = "Generate Tailored Resume";
+        }
       }
 
-      // Display resume content
-      function displayResume() {
-        // Update summary based on job (in real app, AI would customize this)
+      // Display resume content - Task 4.4: Render generated resume
+      function displayResume(resumeData) {
+        try {
+          if (!resumeData) {
+            // Fallback to sample data if no resume data provided
+            displayResumeSample();
+            return;
+          }
+
+          // Update Header
+          const header = resumeData.header || {};
+          const resumeHeaderEl = document.getElementById("resumeHeader");
+        
+        // Update name
+        const nameEl = resumeHeaderEl.querySelector(".resume-name");
+        if (nameEl && header.name) {
+          nameEl.textContent = header.name.toUpperCase();
+        }
+
+        // Update contact info
+        const contactEls = resumeHeaderEl.querySelectorAll(".resume-contact");
+        const contactInfo = [];
+        if (header.location) contactInfo.push(header.location);
+        if (header.email) contactInfo.push(header.email);
+        if (header.phone) contactInfo.push(header.phone);
+        
+        if (contactEls.length > 0 && contactInfo.length > 0) {
+          const links = (header.links || []).map(link => {
+            // Extract domain from URL
+            const url = link.url || "";
+            const domain = url.replace(/^https?:\/\//, "").replace(/^www\./, "").split('/')[0];
+            return domain || link.platform || "";
+          }).filter(Boolean);
+          
+          if (links.length > 0) {
+            contactInfo.push(...links);
+          }
+          
+          // Split contact info into two lines if needed
+          const midPoint = Math.ceil(contactInfo.length / 2);
+          contactEls[0].textContent = contactInfo.slice(0, midPoint).join(" | ");
+          if (contactEls.length > 1) {
+            contactEls[1].textContent = contactInfo.slice(midPoint).join(" | ");
+          } else if (contactInfo.length > midPoint) {
+            const secondLine = document.createElement("div");
+            secondLine.className = "resume-contact";
+            secondLine.textContent = contactInfo.slice(midPoint).join(" | ");
+            resumeHeaderEl.insertBefore(secondLine, resumeSummary);
+          }
+        }
+
+        // Update summary
+        if (resumeSummary && header.summary) {
+          resumeSummary.textContent = header.summary;
+        }
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+          if (!text) return "";
+          const div = document.createElement("div");
+          div.textContent = text;
+          return div.innerHTML;
+        }
+
+        // Display Education
+        educationSection.innerHTML = "";
+        if (resumeData.education && resumeData.education.entries && resumeData.education.entries.length > 0) {
+          resumeData.education.entries.forEach((edu) => {
+            const eduDiv = document.createElement("div");
+            eduDiv.className = "education-entry";
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "entry-title";
+            titleDiv.textContent = edu.degreeName || "";
+            
+            const dateDiv = document.createElement("div");
+            dateDiv.className = "entry-dates";
+            dateDiv.textContent = edu.dateRange || "";
+            
+            const bulletsUl = document.createElement("ul");
+            bulletsUl.className = "entry-bullets";
+            (edu.bullets || []).forEach((bullet) => {
+              const li = document.createElement("li");
+              li.textContent = bullet || "";
+              bulletsUl.appendChild(li);
+            });
+            
+            eduDiv.appendChild(titleDiv);
+            eduDiv.appendChild(dateDiv);
+            eduDiv.appendChild(bulletsUl);
+            educationSection.appendChild(eduDiv);
+          });
+        } else {
+          // Show message if no education entries
+          educationSection.innerHTML = "<div style='padding: 10px; color: #666; font-style: italic;'>No education information available.</div>";
+        }
+
+        // Display Experience
+        experienceSection.innerHTML = "";
+        if (resumeData.experience && resumeData.experience.entries && resumeData.experience.entries.length > 0) {
+          resumeData.experience.entries.forEach((exp) => {
+            const expDiv = document.createElement("div");
+            expDiv.className = "experience-entry";
+            
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "entry-title";
+            titleDiv.textContent = exp.title || "";
+            
+            const dateDiv = document.createElement("div");
+            dateDiv.className = "entry-dates";
+            dateDiv.textContent = exp.dateRange || "";
+            
+            const bulletsUl = document.createElement("ul");
+            bulletsUl.className = "entry-bullets";
+            (exp.bullets || []).forEach((bullet) => {
+              const li = document.createElement("li");
+              li.textContent = bullet || "";
+              bulletsUl.appendChild(li);
+            });
+            
+            expDiv.appendChild(titleDiv);
+            expDiv.appendChild(dateDiv);
+            expDiv.appendChild(bulletsUl);
+            experienceSection.appendChild(expDiv);
+          });
+        } else {
+          // Show message if no experience entries
+          experienceSection.innerHTML = "<div style='padding: 10px; color: #666; font-style: italic;'>No experience information available.</div>";
+        }
+
+        // Display Skills
+        skillsSection.innerHTML = "";
+        if (resumeData.skills && resumeData.skills.bullets && resumeData.skills.bullets.length > 0) {
+          resumeData.skills.bullets.forEach((skill) => {
+            const li = document.createElement("li");
+            li.textContent = skill;
+            skillsSection.appendChild(li);
+          });
+        } else {
+          // Show message if no skills
+          skillsSection.innerHTML = "<li style='color: #666; font-style: italic;'>No skills information available.</li>";
+        }
+        } catch (error) {
+          console.error("Error displaying resume:", error);
+          educationSection.innerHTML = `<div style='padding: 20px; text-align: center; color: #d32f2f;'>Error displaying resume: ${error.message}</div>`;
+        }
+      }
+
+      // Fallback: Display sample resume (for backward compatibility)
+      function displayResumeSample() {
+        // Update summary based on job
         const jobDescription = jobDescriptionInput.value.toLowerCase();
         if (jobDescription.includes("machine learning") || jobDescription.includes("ml")) {
           resumeSummary.textContent =

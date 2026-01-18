@@ -1,6 +1,6 @@
 # API Endpoints Documentation
 
-This document defines all REST API endpoints for the OneProfile application.
+This document defines all REST API endpoints for the IdentityMaster application.
 
 **Base URL**: `http://localhost:5000/api`
 

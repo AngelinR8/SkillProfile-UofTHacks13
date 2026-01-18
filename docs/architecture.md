@@ -1,12 +1,12 @@
 # System Architecture
 
-This document describes the overall architecture of OneProfile, including system components, data flow, and key design decisions.
+This document describes the overall architecture of IdentityMaster, including system components, data flow, and key design decisions.
 
 ---
 
 ## Overview
 
-OneProfile is a full-stack web application that helps users manage their professional identity across multiple platforms. The system consists of:
+IdentityMaster is a full-stack web application that helps users manage their professional identity across multiple platforms. The system consists of:
 
 - **Frontend**: HTML/CSS/JavaScript web application
 - **Backend**: Express.js REST API server
