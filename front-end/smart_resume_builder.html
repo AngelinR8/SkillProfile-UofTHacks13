@@ -34,12 +34,6 @@
         gap: 20px;
       }
 
-      .search-input {
-        max-width: 300px;
-        padding: 8px 12px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
 
       .header-right {
         display: flex;
@@ -57,6 +51,22 @@
         width: 50px;
         height: 50px;
         border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .profile-nav p {
+        cursor: pointer;
+      }
+
+      .settings-icon {
+        font-size: 24px;
+        cursor: pointer;
+        color: white;
+        transition: opacity 0.2s;
+      }
+
+      .settings-icon:hover {
+        opacity: 0.8;
       }
 
       /* MAIN CONTAINER */
@@ -348,15 +358,16 @@
     <header>
       <div class="header-content">
         <h1>OneProfile</h1>
-        <input type="text" placeholder="Search..." class="search-input" />
         <div class="header-right">
+          <span class="settings-icon" onclick="location.href = 'account_settings.html'">⚙️</span>
           <div class="profile-nav">
             <img
               src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg"
               class="profile-picture"
               alt="Profile"
+              onclick="location.href = 'profile.html'"
             />
-            <p>Alex</p>
+            <p onclick="location.href = 'profile.html'">Alex</p>
           </div>
         </div>
       </div>

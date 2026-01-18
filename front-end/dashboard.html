@@ -32,12 +32,6 @@
         gap: 20px;
       }
 
-      .search-input {
-        max-width: 300px;
-        padding: 8px 12px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
 
       .header-right {
         display: flex;
@@ -55,54 +49,23 @@
         width: 50px;
         height: 50px;
         border-radius: 50%;
+        cursor: pointer;
       }
 
-      /* NOTIFICATIONS */
-      .notification-dropdown {
-        position: relative;
+      .profile-nav p,
+      .profile-nav a {
+        cursor: pointer;
       }
 
-      .notification-btn {
-        background: none;
-        border: none;
-        color: white;
+      .settings-icon {
         font-size: 24px;
         cursor: pointer;
+        color: white;
+        transition: opacity 0.2s;
       }
 
-      .notification-menu {
-        display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        min-width: 250px;
-        z-index: 1000;
-        margin-top: 8px;
-      }
-
-      .notification-item {
-        padding: 12px;
-        border-bottom: 1px solid #eee;
-        font-size: 14px;
-        color: #333;
-        cursor: pointer;
-      }
-
-      .notification-item:last-child {
-        border-bottom: none;
-      }
-
-      .notification-item:hover {
-        background-color: #f5f5f5;
-      }
-
-      .notification-btn:hover + .notification-menu,
-      .notification-menu:hover {
-        display: block;
+      .settings-icon:hover {
+        opacity: 0.8;
       }
 
       /* CONTAINER */
@@ -185,25 +148,13 @@
     <header>
       <div class="header-content">
         <h1>OneProfile</h1>
-        <input type="text" placeholder="Search..." class="search-input" />
-
         <div class="header-right">
-          <div class="notification-dropdown">
-            <button class="notification-btn">🔔</button>
-            <div class="notification-menu">
-              <div class="notification-item">
-                Profile strength improved to 85%
-              </div>
-              <div class="notification-item">
-                Interview prep analysis completed
-              </div>
-            </div>
-          </div>
-
+          <span class="settings-icon" onclick="location.href = 'account_settings.html'">⚙️</span>
           <div class="profile">
             <img
               src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg"
               class="profile-picture"
+              onclick="location.href = 'profile.html'"
             />
             <a href="profile.html">Alex</a>
           </div>
@@ -226,13 +177,14 @@
       <!-- Quick Stats Card -->
       <div class="activity-card">
         <div class="header">
-          <span>📊</span>
-          <h2>Quick Stats</h2>
+          <span>📚</span>
+          <h2>Identity Vault Stats</h2>
         </div>
-        <p>📱 Social posts: 12</p>
-        <p>📄 Resumes: 5</p>
-        <p>💼 Interview Preps: 3</p>
-        <p>✨ Profile strength: 85%</p>
+        <p id="stat-degrees">🎓 Degrees: <span>1</span></p>
+        <p id="stat-experiences">💼 Experiences: <span>3</span></p>
+        <p id="stat-projects">🚀 Projects: <span>5</span></p>
+        <p id="stat-skills">🛠️ Skills: <span>12</span></p>
+        <p id="stat-awards">🏆 Awards: <span>4</span></p>
       </div>
 
       <!-- Quick Actions Card -->
@@ -297,5 +249,42 @@
         <div class="footer">[View All Activity →]</div>
       </div>
     </div>
+
+    <script>
+      // Load vault statistics from API
+      async function loadVaultStats() {
+        try {
+          const response = await fetch("http://localhost:5000/api/vault/stats");
+          const data = await response.json();
+          
+          if (data.stats) {
+            const stats = data.stats;
+            
+            // Update dashboard stats
+            const degreesSpan = document.querySelector("#stat-degrees span");
+            const experiencesSpan = document.querySelector("#stat-experiences span");
+            const projectsSpan = document.querySelector("#stat-projects span");
+            const skillsSpan = document.querySelector("#stat-skills span");
+            const awardsSpan = document.querySelector("#stat-awards span");
+            
+            if (degreesSpan) degreesSpan.textContent = stats.degrees;
+            if (experiencesSpan) experiencesSpan.textContent = stats.experiences;
+            if (projectsSpan) projectsSpan.textContent = stats.projects;
+            if (skillsSpan) skillsSpan.textContent = stats.skills;
+            if (awardsSpan) awardsSpan.textContent = stats.awards;
+          }
+        } catch (error) {
+          console.error("Error loading vault stats:", error);
+          // Keep default values if API fails
+        }
+      }
+
+      // Load stats when page loads
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", loadVaultStats);
+      } else {
+        loadVaultStats();
+      }
+    </script>
   </body>
 </html>

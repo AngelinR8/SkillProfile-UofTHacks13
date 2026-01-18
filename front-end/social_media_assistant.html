@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Social Media Assistant - OneProfile</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        padding-bottom: 40px;
+      }
+
+      /* HEADER / TOP BAR */
+      header {
+        background-color: #333;
+        color: white;
+        padding: 20px;
+        width: 100%;
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .profile-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .profile-picture {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .profile-nav p {
+        cursor: pointer;
+      }
+
+      .settings-icon {
+        font-size: 24px;
+        cursor: pointer;
+        color: white;
+        transition: opacity 0.2s;
+      }
+
+      .settings-icon:hover {
+        opacity: 0.8;
+      }
+
+      /* MAIN CONTAINER */
+      .main-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 20px;
+      }
+
+      /* PAGE TITLE */
+      .page-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 30px;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      /* AI CHAT CARD */
+      .chat-card {
+        background: white;
+        border: 2px solid #333;
+        border-radius: 8px;
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+      }
+
+      .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid black;
+        font-size: 14px;
+        font-weight: bold;
+        background-color: #f9f9f9;
+      }
+
+      .clear-chat {
+        color: #666;
+        cursor: pointer;
+        text-decoration: underline;
+        font-size: 12px;
+      }
+
+      .clear-chat:hover {
+        color: #333;
+      }
+
+      .chat-messages {
+        padding: 30px;
+        min-height: 300px;
+        max-height: 500px;
+        overflow-y: auto;
+        background-color: #fafafa;
+      }
+
+      .message {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 12px;
+      }
+
+      .message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        background-color: #e0e0e0;
+      }
+
+      .message-content {
+        flex: 1;
+      }
+
+      .message-sender {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 13px;
+      }
+
+      .message-text {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #333;
+        font-family: Arial, sans-serif;
+      }
+
+      .ai-message .message-avatar {
+        background-color: #2196f3;
+        color: white;
+      }
+
+      .user-message .message-avatar {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      .examples-section {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px dashed #ccc;
+        font-size: 13px;
+        color: #666;
+      }
+
+      .examples-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .examples-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .examples-list li {
+        margin-bottom: 5px;
+        padding-left: 15px;
+        position: relative;
+      }
+
+      .examples-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #333;
+      }
+
+      .chat-input-area {
+        padding: 20px;
+        border-top: 1px solid #ccc;
+        display: flex;
+        gap: 10px;
+        background-color: white;
+      }
+
+      .chat-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 60px;
+      }
+
+      .chat-input:focus {
+        outline: 2px solid #333;
+      }
+
+      .send-button {
+        padding: 10px 20px;
+        white-space: nowrap;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 13px;
+      }
+
+      .send-button:hover {
+        background-color: #555;
+      }
+
+      /* PLATFORM MODULES */
+      .platform-modules {
+        margin-top: 30px;
+      }
+
+      .modules-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .module-card {
+        background: white;
+        border: 1px solid black;
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 20px;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+      }
+
+      .module-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid black;
+        font-size: 14px;
+        font-weight: bold;
+        background-color: #f9f9f9;
+      }
+
+      .module-toggle {
+        color: #666;
+        cursor: pointer;
+        text-decoration: underline;
+        font-size: 12px;
+      }
+
+      .module-toggle:hover {
+        color: #333;
+      }
+
+      .module-content {
+        display: none;
+        padding: 30px;
+      }
+
+      .module-content.active {
+        display: block;
+      }
+
+      .module-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+      }
+
+      .tab-button {
+        background: none;
+        border: none;
+        padding: 8px 15px;
+        cursor: pointer;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 13px;
+        color: #666;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+      }
+
+      .tab-button:hover {
+        color: #333;
+      }
+
+      .tab-button.active {
+        color: #000;
+        border-bottom-color: #000;
+        font-weight: bold;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .suggestion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .new-badge {
+        background-color: #ffd700;
+        color: #333;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: bold;
+      }
+
+      .suggestion-card {
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #fafafa;
+      }
+
+      .suggestion-title {
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 14px;
+      }
+
+      .suggestion-content {
+        font-size: 13px;
+        line-height: 1.6;
+        color: #333;
+        white-space: pre-wrap;
+        margin-bottom: 15px;
+      }
+
+      .copy-button {
+        background-color: #333;
+        color: white;
+        border: 1px solid #333;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 12px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        transition: all 0.2s;
+      }
+
+      .copy-button:hover {
+        background-color: #555;
+        border-color: #555;
+      }
+
+      .copy-button.copied {
+        background-color: #4caf50;
+        color: white;
+        border-color: #4caf50;
+      }
+
+      .tip-box {
+        background-color: #fffacd;
+        border-left: 3px solid #ffd700;
+        padding: 12px 15px;
+        margin-top: 20px;
+        font-size: 12px;
+        color: #666;
+      }
+
+      .placeholder-state {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+        font-style: italic;
+      }
+
+      .coming-soon {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+        font-style: italic;
+        font-size: 13px;
+      }
+
+      .back-button-container {
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 14px;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background-color: #555;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="header-content">
+        <h1 style="cursor: pointer;" onclick="location.href = 'dashboard.html'">OneProfile</h1>
+        <div class="header-right">
+          <span class="settings-icon" onclick="location.href = 'account_settings.html'">⚙️</span>
+          <div class="profile-nav">
+            <img
+              src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg"
+              class="profile-picture"
+              alt="Profile"
+              onclick="location.href = 'profile.html'"
+            />
+            <p onclick="location.href = 'profile.html'">Alex</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <div class="page-title">
+        <span>📱</span>
+        <span>Social Media Assistant</span>
+      </div>
+
+      <!-- AI Chat Section -->
+      <div class="chat-card">
+        <div class="chat-header">
+          <span>AI CHAT</span>
+          <span class="clear-chat" id="clearChatBtn">[Clear Chat]</span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="message ai-message">
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+              <div class="message-sender">AI Assistant:</div>
+              <div class="message-text">
+                Hi Alex! Tell me what you've been working on, and I'll help you
+                update your social profiles.
+              </div>
+            </div>
+          </div>
+          <div class="examples-section">
+            <div class="examples-title">Try saying:</div>
+            <ul class="examples-list">
+              <li>I just finished a hackathon...</li>
+              <li>I started an internship at...</li>
+              <li>I learned React and built...</li>
+            </ul>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <textarea
+            class="chat-input"
+            id="chatInput"
+            placeholder="Tell me about your recent accomplishments..."
+          ></textarea>
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <button class="send-button" id="sendMessageBtn">Send</button>
+            <div style="font-size: 11px; color: #666; text-align: center;">
+              or press Enter
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Platform Modules Section -->
+      <div class="platform-modules">
+        <div class="modules-title">
+          <span>📁</span>
+          <span>Platform Modules</span>
+        </div>
+
+        <!-- LinkedIn Module -->
+        <div class="module-card">
+          <div class="module-header">
+            <span>💼 LinkedIn <span style="color: #666; font-size: 12px; font-weight: normal;">- 💡 4 suggestions ready</span></span>
+            <span class="module-toggle" id="linkedinToggle">
+              <span id="linkedinToggleText">[Open Module ▼]</span>
+            </span>
+          </div>
+          <div class="module-content" id="linkedinContent">
+            <div class="module-tabs">
+              <button class="tab-button active" data-tab="posts">
+                [📝 Posts]
+              </button>
+              <button class="tab-button" data-tab="education">
+                [🎓 Education]
+              </button>
+              <button class="tab-button" data-tab="skills">[🛠️ Skills]</button>
+              <button class="tab-button" data-tab="experience">
+                [💼 Experience]
+              </button>
+            </div>
+
+            <!-- Posts Tab -->
+            <div class="tab-content active" id="tab-posts">
+              <div class="suggestion-header">
+                <span style="font-weight: bold; font-size: 14px">📝 Posts & Activity</span>
+                <span class="new-badge" id="postsNewBadge">✨ 1 New</span>
+              </div>
+              <div id="postsSuggestions">
+                <div class="suggestion-card">
+                  <div class="suggestion-title">Suggested Post:</div>
+                  <div class="suggestion-content">🎉 Excited to share that our team won Best Use of Gemini API at UofTHacks! Over 36 hours, we built OneProfile - an AI-powered career assistant using React, Google&apos;s Gemini API, and MongoDB. This experience taught me so much about prompt engineering and rapid prototyping. Huge thanks to my amazing teammates and the UofTHacks organizers! 🚀
+
+#UofTHacks #AI #Hackathon #GeminiAPI</div>
+                  <div>
+                    <button class="copy-button" onclick="copyPostContent(this)">📄 Copy Post</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Education Tab -->
+            <div class="tab-content" id="tab-education">
+              <div class="suggestion-header">
+                <span style="font-weight: bold; font-size: 14px">🎓 Education</span>
+                <span class="new-badge" id="educationNewBadge">✨ 1 New</span>
+              </div>
+              <div id="educationSuggestions">
+                <div class="suggestion-card">
+                  <div class="suggestion-title">Suggested Education Update:</div>
+                  <div class="suggestion-content">University: University of Toronto
+Degree: Bachelor of Science - Computer Science
+Years: 2021 - 2025
+Location: Toronto, ON, Canada
+GPA: 3.7/4.0
+Relevant Coursework:
+• Data Structures and Algorithms
+• Machine Learning
+• Software Engineering
+• Database Systems</div>
+                  <div>
+                    <button class="copy-button" onclick="copyAllEducation(this)">📄 Copy Education Info</button>
+                  </div>
+                  <div class="tip-box">
+                    💡 Tip: Go to LinkedIn → Education section and paste this information
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Skills Tab -->
+            <div class="tab-content" id="tab-skills">
+              <div class="suggestion-header">
+                <span style="font-weight: bold; font-size: 14px">🛠️ Skills</span>
+                <span class="new-badge" id="skillsNewBadge">✨ 3 New</span>
+              </div>
+              <div id="skillsSuggestions">
+                <div class="suggestion-card">
+                  <div class="suggestion-title">Suggested Skills to Add:</div>
+                  <div style="margin: 15px 0;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; background: white;">
+                      <div>
+                        <strong>Google Gemini API</strong>
+                        <span style="background: #ffd700; color: #333; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 8px;">NEW!</span>
+                      </div>
+                      <button class="copy-button" onclick="copyToClipboard(this, 'Google Gemini API')">📄 Copy Skill Name</button>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; background: white;">
+                      <div>
+                        <strong>MongoDB</strong>
+                        <span style="background: #ffd700; color: #333; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 8px;">NEW!</span>
+                      </div>
+                      <button class="copy-button" onclick="copyToClipboard(this, 'MongoDB')">📄 Copy Skill Name</button>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #ddd; background: white;">
+                      <div>
+                        <strong>Prompt Engineering</strong>
+                        <span style="background: #ffd700; color: #333; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 8px;">NEW!</span>
+                      </div>
+                      <button class="copy-button" onclick="copyToClipboard(this, 'Prompt Engineering')">📄 Copy Skill Name</button>
+                    </div>
+                  </div>
+                  <button class="copy-button" onclick="copyAllSkills(this)">📄 Copy All Skills</button>
+                  <div class="tip-box">
+                    💡 Tip: Go to LinkedIn → Skills section and add these skills manually
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Experience Tab -->
+            <div class="tab-content" id="tab-experience">
+              <div class="suggestion-header">
+                <span style="font-weight: bold; font-size: 14px">💼 Experience</span>
+                <span class="new-badge" id="experienceNewBadge">✨ 1 New</span>
+              </div>
+              <div id="experienceSuggestions">
+                <div class="suggestion-card">
+                  <div class="suggestion-title">Suggested Project to Add:</div>
+                  <div class="suggestion-content">Project Name: OneProfile - AI Career Assistant
+Date: Jan 2026
+Description: Built an AI-powered platform that helps job seekers manage their professional identity. Integrated Google's Gemini API for intelligent content generation and MongoDB for data storage. Won Best Use of Gemini API at UofTHacks 2026.
+Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev</div>
+                  <div>
+                    <button class="copy-button" onclick="copyToClipboard(this, 'OneProfile - AI Career Assistant')">📄 Copy Project Title</button>
+                    <button class="copy-button" onclick="copyProjectDescription(this)">📄 Copy Description</button>
+                    <button class="copy-button" onclick="copyToClipboard(this, 'React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev')">📄 Copy Skills</button>
+                    <button class="copy-button" onclick="copyAllProject(this)">📄 Copy Everything</button>
+                  </div>
+                  <div class="tip-box">
+                    💡 Tip: Go to LinkedIn → Projects section and add this project manually
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GitHub Module -->
+        <div class="module-card">
+          <div class="module-header">
+            <span>🐙 GitHub</span>
+            <span class="module-toggle" style="cursor: default; text-decoration: none; color: #999;">
+              Coming soon...
+            </span>
+          </div>
+        </div>
+
+        <!-- Twitter Module -->
+        <div class="module-card">
+          <div class="module-header">
+            <span>🐦 Twitter</span>
+            <span class="module-toggle" style="cursor: default; text-decoration: none; color: #999;">
+              Coming soon...
+            </span>
+          </div>
+        </div>
+
+        <!-- Instagram Module -->
+        <div class="module-card">
+          <div class="module-header">
+            <span>📷 Instagram</span>
+            <span class="module-toggle" style="cursor: default; text-decoration: none; color: #999;">
+              Coming soon...
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="back-button-container">
+        <button onclick="location.href = 'dashboard.html'">
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // State management
+      let suggestionCount = {
+        posts: 0,
+        education: 0,
+        skills: 0,
+        experience: 0,
+      };
+
+      // DOM Elements
+      const chatMessages = document.getElementById("chatMessages");
+      const chatInput = document.getElementById("chatInput");
+      const sendMessageBtn = document.getElementById("sendMessageBtn");
+      const clearChatBtn = document.getElementById("clearChatBtn");
+      const linkedinToggle = document.getElementById("linkedinToggle");
+      const linkedinContent = document.getElementById("linkedinContent");
+      const linkedinToggleText = document.getElementById("linkedinToggleText");
+
+      // Add user message
+      function addUserMessage(text) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "message user-message";
+        messageDiv.innerHTML = `
+          <div class="message-avatar">👤</div>
+          <div class="message-content">
+            <div class="message-sender">You:</div>
+            <div class="message-text">${text}</div>
+          </div>
+        `;
+        
+        // Remove examples section if exists
+        const examplesSection = chatMessages.querySelector(".examples-section");
+        if (examplesSection) {
+          examplesSection.remove();
+        }
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Add AI message
+      function addAIMessage(text) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "message ai-message";
+        messageDiv.innerHTML = `
+          <div class="message-avatar">🤖</div>
+          <div class="message-content">
+            <div class="message-sender">AI Assistant:</div>
+            <div class="message-text">${text}</div>
+          </div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Generate sample suggestions based on user input
+      function generateSuggestions(userInput) {
+        const lowerInput = userInput.toLowerCase();
+        
+        // Simple keyword detection for demo
+        if (lowerInput.includes("hackathon") || lowerInput.includes("won")) {
+          suggestionCount.posts = 1;
+          suggestionCount.skills = 3;
+          suggestionCount.experience = 1;
+          
+          // Show suggestions
+          showPostsSuggestion();
+          showSkillsSuggestions();
+          showExperienceSuggestion();
+          updateModuleHeader();
+        } else if (lowerInput.includes("internship") || lowerInput.includes("job")) {
+          suggestionCount.experience = 1;
+          showExperienceSuggestion();
+          updateModuleHeader();
+        } else if (lowerInput.includes("learn") || lowerInput.includes("skill")) {
+          suggestionCount.skills = 2;
+          showSkillsSuggestions();
+          updateModuleHeader();
+        } else if (lowerInput.includes("degree") || lowerInput.includes("graduate")) {
+          suggestionCount.education = 1;
+          showEducationSuggestion();
+          updateModuleHeader();
+        }
+      }
+
+      // Show posts suggestion
+      function showPostsSuggestion() {
+        const container = document.getElementById("postsSuggestions");
+        container.innerHTML = `
+          <div class="suggestion-card">
+            <div class="suggestion-title">Suggested Post:</div>
+            <div class="suggestion-content">🎉 Excited to share that our team won Best Use of Gemini API at UofTHacks! Over 36 hours, we built OneProfile - an AI-powered career assistant using React, Google's Gemini API, and MongoDB. This experience taught me so much about prompt engineering and rapid prototyping. Huge thanks to my amazing teammates and the UofTHacks organizers! 🚀
+
+#UofTHacks #AI #Hackathon #GeminiAPI</div>
+            <div>
+              <button class="copy-button" onclick="copyPostContent(this)">📄 Copy Post</button>
+            </div>
+          </div>
+        `;
+        document.getElementById("postsNewBadge").style.display = "inline-block";
+      }
+
+      // Show skills suggestions
+      function showSkillsSuggestions() {
+        const container = document.getElementById("skillsSuggestions");
+        container.innerHTML = `
+          <div class="suggestion-card">
+            <div class="suggestion-title">Suggested Skills to Add:</div>
+            <div style="margin: 15px 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; background: white;">
+                <div>
+                  <strong>Google Gemini API</strong>
+                  <span style="background: #ffd700; color: #333; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 8px;">NEW!</span>
+                </div>
+                <button class="copy-button" onclick="copyToClipboard(this, 'Google Gemini API')">📄 Copy Skill Name</button>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; background: white;">
+                <div>
+                  <strong>MongoDB</strong>
+                  <span style="background: #ffd700; color: #333; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 8px;">NEW!</span>
+                </div>
+                <button class="copy-button" onclick="copyToClipboard(this, 'MongoDB')">📄 Copy Skill Name</button>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #ddd; background: white;">
+                <div>
+                  <strong>Prompt Engineering</strong>
+                  <span style="background: #ffd700; color: #333; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 8px;">NEW!</span>
+                </div>
+                <button class="copy-button" onclick="copyToClipboard(this, 'Prompt Engineering')">📄 Copy Skill Name</button>
+              </div>
+            </div>
+            <button class="copy-button" onclick="copyAllSkills(this)">📄 Copy All Skills</button>
+            <div class="tip-box">
+              💡 Tip: Go to LinkedIn → Skills section and add these skills manually
+            </div>
+          </div>
+        `;
+        document.getElementById("skillsNewBadge").style.display = "inline-block";
+        document.getElementById("skillsNewBadge").textContent = `✨ ${suggestionCount.skills} New`;
+      }
+
+      // Show experience suggestion
+      function showExperienceSuggestion() {
+        const container = document.getElementById("experienceSuggestions");
+        container.innerHTML = `
+          <div class="suggestion-card">
+            <div class="suggestion-title">Suggested Project to Add:</div>
+            <div class="suggestion-content">Project Name: OneProfile - AI Career Assistant
+Date: Jan 2026
+Description: Built an AI-powered platform that helps job seekers manage their professional identity. Integrated Google's Gemini API for intelligent content generation and MongoDB for data storage. Won Best Use of Gemini API at UofTHacks 2026.
+Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev</div>
+            <div>
+              <button class="copy-button" onclick="copyToClipboard(this, 'OneProfile - AI Career Assistant')">📄 Copy Project Title</button>
+              <button class="copy-button" onclick="copyProjectDescription(this)">📄 Copy Description</button>
+              <button class="copy-button" onclick="copyToClipboard(this, 'React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Dev')">📄 Copy Skills</button>
+              <button class="copy-button" onclick="copyAllProject(this)">📄 Copy Everything</button>
+            </div>
+            <div class="tip-box">
+              💡 Tip: Go to LinkedIn → Projects section and add this project manually
+            </div>
+          </div>
+        `;
+        document.getElementById("experienceNewBadge").style.display = "inline-block";
+      }
+
+      // Show education suggestion
+      function showEducationSuggestion() {
+        const container = document.getElementById("educationSuggestions");
+        container.innerHTML = `
+          <div class="suggestion-card">
+            <div class="suggestion-title">Suggested Education Update:</div>
+            <div class="suggestion-content">University: University of Toronto
+Degree: Bachelor of Science - Computer Science
+Years: 2021 - 2025
+Location: Toronto, ON, Canada
+GPA: 3.7/4.0
+Relevant Coursework:
+• Data Structures and Algorithms
+• Machine Learning
+• Software Engineering
+• Database Systems</div>
+            <div>
+              <button class="copy-button" onclick="copyAllEducation(this)">📄 Copy Education Info</button>
+            </div>
+            <div class="tip-box">
+              💡 Tip: Go to LinkedIn → Education section and paste this information
+            </div>
+          </div>
+        `;
+        document.getElementById("educationNewBadge").style.display = "inline-block";
+      }
+
+      // Update module header with suggestion count
+      function updateModuleHeader() {
+        const total = Object.values(suggestionCount).reduce((a, b) => a + b, 0);
+        if (total > 0) {
+          linkedinToggleText.textContent = `[Close Module ▲] - 💡 ${total} suggestions ready`;
+        }
+      }
+
+      // Copy to clipboard function
+      function copyToClipboard(button, text) {
+        navigator.clipboard.writeText(text).then(() => {
+          const original = button.textContent;
+          button.textContent = "✓ Copied!";
+          button.classList.add("copied");
+          setTimeout(() => {
+            button.textContent = original;
+            button.classList.remove("copied");
+          }, 2000);
+        }).catch((error) => {
+          console.error("Failed to copy:", error);
+          alert("Failed to copy to clipboard. Please try again.");
+        });
+      }
+
+      // Copy post content
+      function copyPostContent(button) {
+        const postText = "🎉 Excited to share that our team won Best Use of Gemini API at UofTHacks! Over 36 hours, we built OneProfile - an AI-powered career assistant using React, Google's Gemini API, and MongoDB. This experience taught me so much about prompt engineering and rapid prototyping. Huge thanks to my amazing teammates and the UofTHacks organizers! 🚀\n\n#UofTHacks #AI #Hackathon #GeminiAPI";
+        copyToClipboard(button, postText);
+      }
+
+      // Copy project description
+      function copyProjectDescription(button) {
+        const description = "Built an AI-powered platform that helps job seekers manage their professional identity. Integrated Google's Gemini API for intelligent content generation and MongoDB for data storage. Won Best Use of Gemini API at UofTHacks 2026.";
+        copyToClipboard(button, description);
+      }
+
+      // Copy all skills
+      function copyAllSkills(button) {
+        const skills = "Google Gemini API\nMongoDB\nPrompt Engineering";
+        copyToClipboard(button, skills);
+      }
+
+      // Copy all project
+      function copyAllProject(button) {
+        const project = `Project: OneProfile - AI Career Assistant
+Date: Jan 2026
+Built an AI-powered platform that helps job seekers manage their professional identity. Integrated Google's Gemini API for intelligent content generation and MongoDB for data storage. Won Best Use of Gemini API at UofTHacks 2026.
+Skills: React, Google Gemini API, MongoDB, Prompt Engineering, Full-Stack Development`;
+        copyToClipboard(button, project);
+      }
+
+      // Copy all education
+      function copyAllEducation(button) {
+        const education = `University: University of Toronto
+Degree: Bachelor of Science - Computer Science
+Years: 2021 - 2025
+Location: Toronto, ON, Canada
+GPA: 3.7/4.0
+Relevant Coursework:
+• Data Structures and Algorithms
+• Machine Learning
+• Software Engineering
+• Database Systems`;
+        copyToClipboard(button, education);
+      }
+
+      // Send message
+      function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addUserMessage(message);
+        chatInput.value = "";
+
+        // Simulate AI response
+        setTimeout(() => {
+          addAIMessage(
+            "Great! I've analyzed your update and generated LinkedIn suggestions for you. Check the Platform Modules section below!"
+          );
+          generateSuggestions(message);
+        }, 1000);
+      }
+
+      // Toggle LinkedIn module
+      linkedinToggle.addEventListener("click", () => {
+        const isOpen = linkedinContent.classList.contains("active");
+        if (isOpen) {
+          linkedinContent.classList.remove("active");
+          linkedinToggleText.textContent = "[Open Module ▼]";
+        } else {
+          linkedinContent.classList.add("active");
+          updateModuleHeader();
+        }
+      });
+
+      // Tab switching
+      document.querySelectorAll(".tab-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const tabName = button.getAttribute("data-tab");
+
+          // Update active tab button
+          document.querySelectorAll(".tab-button").forEach((btn) => {
+            btn.classList.remove("active");
+          });
+          button.classList.add("active");
+
+          // Update active tab content
+          document.querySelectorAll(".tab-content").forEach((content) => {
+            content.classList.remove("active");
+          });
+          document.getElementById(`tab-${tabName}`).classList.add("active");
+        });
+      });
+
+      // Event listeners
+      sendMessageBtn.addEventListener("click", sendMessage);
+      chatInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      clearChatBtn.addEventListener("click", () => {
+        if (confirm("Are you sure you want to clear the chat?")) {
+          chatMessages.innerHTML = `
+            <div class="message ai-message">
+              <div class="message-avatar">🤖</div>
+              <div class="message-content">
+                <div class="message-sender">AI Assistant:</div>
+                <div class="message-text">
+                  Hi Alex! Tell me what you've been working on, and I'll help you
+                  update your social profiles.
+                </div>
+              </div>
+            </div>
+            <div class="examples-section">
+              <div class="examples-title">Try saying:</div>
+              <ul class="examples-list">
+                <li>I just finished a hackathon...</li>
+                <li>I started an internship at...</li>
+                <li>I learned React and built...</li>
+              </ul>
+            </div>
+          `;
+          // Reset suggestions
+          suggestionCount = { posts: 0, education: 0, skills: 0, experience: 0 };
+          document.getElementById("postsSuggestions").innerHTML =
+            '<div class="placeholder-state">No posts suggestions yet. Chat with AI to generate suggestions!</div>';
+          document.getElementById("educationSuggestions").innerHTML =
+            '<div class="placeholder-state">No education suggestions yet. Chat with AI to generate suggestions!</div>';
+          document.getElementById("skillsSuggestions").innerHTML =
+            '<div class="placeholder-state">No skills suggestions yet. Chat with AI to generate suggestions!</div>';
+          document.getElementById("experienceSuggestions").innerHTML =
+            '<div class="placeholder-state">No experience suggestions yet. Chat with AI to generate suggestions!</div>';
+          document.querySelectorAll(".new-badge").forEach((badge) => {
+            badge.style.display = "none";
+          });
+          linkedinToggleText.textContent = "[Open Module ▼]";
+        }
+      });
+    </script>
+  </body>
+</html>
