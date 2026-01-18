@@ -11,21 +11,19 @@
         padding: 0;
         box-sizing: border-box;
       }
-
       body {
         font-family: Arial, sans-serif;
         background-color: #f5f5f5;
         padding-bottom: 40px;
       }
 
-      /* CONSISTENT HEADER STYLING */
+      /* HEADER */
       header {
         background-color: #333;
         color: white;
         padding: 20px;
         width: 100%;
       }
-
       .header-content {
         max-width: 1200px;
         margin: 0 auto;
@@ -34,33 +32,29 @@
         justify-content: space-between;
         gap: 20px;
       }
-
       .search-input {
         max-width: 300px;
         padding: 8px 12px;
         border: 1px solid #ccc;
         border-radius: 4px;
       }
-
       .header-right {
         display: flex;
         align-items: center;
         gap: 20px;
       }
-
       .profile-nav {
         display: flex;
         align-items: center;
         gap: 10px;
       }
-
       .profile-picture {
         width: 40px;
         height: 40px;
         border-radius: 50%;
       }
 
-      /* MAIN CONTAINER */
+      /* CONTAINERS */
       .container {
         max-width: 1200px;
         margin: 40px auto;
@@ -69,8 +63,6 @@
         flex-direction: column;
         align-items: center;
       }
-
-      /* SHARED CARD STYLING */
       .info-card {
         background: white;
         border: 1px solid black;
@@ -80,7 +72,6 @@
         margin-bottom: 30px;
         box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
       }
-
       .info-header {
         display: flex;
         justify-content: space-between;
@@ -90,7 +81,6 @@
         font-size: 14px;
         font-weight: bold;
       }
-
       .info-body {
         padding: 30px 40px;
       }
@@ -107,11 +97,9 @@
         font-size: 13px;
         transition: background 0.2s;
       }
-
       button:hover {
         background-color: #555;
       }
-
       .btn-outline {
         background: none;
         color: black;
@@ -120,37 +108,32 @@
         margin-left: 5px;
       }
 
-      /* ENTRY BOX STYLING */
+      /* ENTRIES */
       .vault-entry {
         border: 1px solid black;
         padding: 20px;
         margin-bottom: 15px;
       }
-
       .action-row {
         display: flex;
         justify-content: flex-end;
         gap: 10px;
         margin-top: 15px;
       }
-
       .vault-grid {
         text-align: left;
         font-size: 14px;
         margin-top: 15px;
       }
-
       .vault-grid p {
         margin-bottom: 5px;
       }
-
       .center-wrap {
         display: flex;
         justify-content: center;
         width: 100%;
         margin-top: 20px;
       }
-
       h2 {
         font-family: "Courier New", Courier, monospace;
         margin-bottom: 20px;
@@ -158,13 +141,11 @@
         width: 100%;
         max-width: 900px;
       }
-
       ul {
         padding-left: 20px;
         line-height: 1.6;
         margin-top: 10px;
       }
-
       .empty-placeholder {
         border: 1px dashed #ccc;
         color: #999;
@@ -172,6 +153,35 @@
         padding: 20px;
         margin-bottom: 15px;
         font-style: italic;
+      }
+
+      /* MODAL */
+      #vaultModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-content {
+        background: white;
+        border: 2px solid black;
+        padding: 30px;
+        width: 450px;
+        font-family: "Courier New", Courier, monospace;
+      }
+      .modal-content input,
+      .modal-content textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid black;
+        font-family: inherit;
       }
     </style>
   </head>
@@ -201,7 +211,7 @@
       <div class="info-card">
         <div class="info-header">
           <span>VAULT OVERVIEW</span>
-          <button>Add New Item</button>
+          <button id="addGeneric" class="add-btn">Add New Item</button>
         </div>
         <div class="info-body">
           <div style="text-align: center">
@@ -220,7 +230,7 @@
       <div class="info-card">
         <div class="info-header">
           <span>🎓 DEGREES (1)</span>
-          <button>+ Add Degree</button>
+          <button class="add-btn">+ Add Degree</button>
         </div>
         <div class="info-body">
           <div class="vault-entry">
@@ -229,15 +239,6 @@
             </p>
             <p>University of Toronto</p>
             <p style="color: #666">Sep 2024 - Present | GPA: 3.9</p>
-            <ul>
-              <li>
-                Strong foundation in linear algebra, probability, and
-                algorithmic thinking for ML
-              </li>
-              <li>
-                High academic standing in mathematically intensive program
-              </li>
-            </ul>
             <div class="action-row">
               <button class="btn-outline">✏️ Edit</button>
               <button class="btn-outline">🗑️ Delete</button>
@@ -250,7 +251,7 @@
       <div class="info-card">
         <div class="info-header">
           <span>💼 JOBS (3)</span>
-          <button>+ Add Job</button>
+          <button class="add-btn">+ Add Job</button>
         </div>
         <div class="info-body">
           <div class="vault-entry">
@@ -258,42 +259,25 @@
               Software Engineering Intern
             </p>
             <p>Tech Corp Solutions</p>
-            <p style="color: #666">May 2025 - Aug 2025</p>
-            <ul>
-              <li>Developed internal dashboards using React and Node.js</li>
-              <li>Optimized SQL queries reducing latency by 20%</li>
-            </ul>
             <div class="action-row">
               <button class="btn-outline">✏️ Edit</button>
               <button class="btn-outline">🗑️ Delete</button>
               <button class="btn-outline">📋 Copy</button>
             </div>
           </div>
-          <div class="empty-placeholder">
-            Job Slot #2 - Click "Add Job" to fill
-          </div>
-          <div class="empty-placeholder">
-            Job Slot #3 - Click "Add Job" to fill
-          </div>
+          <div class="empty-placeholder">Job Slot #2</div>
+          <div class="empty-placeholder">Job Slot #3</div>
         </div>
       </div>
 
       <div class="info-card">
         <div class="info-header">
           <span>🚀 PROJECTS (5)</span>
-          <button>+ Add Project</button>
+          <button class="add-btn">+ Add Project</button>
         </div>
         <div class="info-body">
           <div class="vault-entry">
             <p style="font-weight: bold; font-size: 1.1em">OneProfile</p>
-            <p>Full-Stack Identity Management System</p>
-            <ul>
-              <li>
-                Built centralized professional identity vault with dynamic UI
-                components
-              </li>
-              <li>Integrated local persistence for user data management</li>
-            </ul>
             <div class="action-row">
               <button class="btn-outline">✏️ Edit</button>
               <button class="btn-outline">🗑️ Delete</button>
@@ -310,33 +294,39 @@
       <div class="info-card">
         <div class="info-header">
           <span>🛠️ SKILLS (12)</span>
-          <button>+ Add Skill</button>
+          <button class="add-btn">+ Add Skill</button>
         </div>
         <div class="info-body">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
-            <div>
-              <p><strong>Technical:</strong></p>
-              <ul>
-                <li>JavaScript</li>
-                <li>Python</li>
-                <li>C++</li>
-                <li>SQL</li>
-                <li>Java</li>
-                <li>HTML/CSS</li>
-              </ul>
-            </div>
-            <div>
-              <p><strong>DevOps & Tools:</strong></p>
-              <ul>
-                <li>React</li>
-                <li>Node.js</li>
-                <li>Git</li>
-                <li>Docker</li>
-                <li>AWS</li>
-                <li>Linux</li>
-              </ul>
+          <div class="vault-entry">
+            <p style="font-weight: bold">Technical Skills</p>
+            <ul>
+              <li>JavaScript, Python, React, Node.js, SQL, Git</li>
+            </ul>
+            <div class="action-row">
+              <button class="btn-outline">✏️ Edit</button>
+              <button class="btn-outline">🗑️ Delete</button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-header">
+          <span>🏆 AWARDS (4)</span>
+          <button class="add-btn">+ Add Award</button>
+        </div>
+        <div class="info-body">
+          <div class="vault-entry">
+            <p style="font-weight: bold">Dean's List</p>
+            <p>University of Toronto | 2024</p>
+            <div class="action-row">
+              <button class="btn-outline">✏️ Edit</button>
+              <button class="btn-outline">🗑️ Delete</button>
+            </div>
+          </div>
+          <div class="empty-placeholder">Award Slot #2</div>
+          <div class="empty-placeholder">Award Slot #3</div>
+          <div class="empty-placeholder">Award Slot #4</div>
         </div>
       </div>
 
@@ -349,6 +339,34 @@
         </button>
       </div>
     </main>
+
+    <div id="vaultModal">
+      <div class="modal-content">
+        <h3 id="modalTitle">Add Item</h3>
+        <input type="text" id="inTitle" placeholder="Title/Role" />
+        <input type="text" id="inSub" placeholder="Org/Company/Date" />
+        <textarea
+          id="inDetails"
+          placeholder="Details (one per line)"
+        ></textarea>
+        <div
+          style="
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+          "
+        >
+          <button
+            onclick="closeVaultModal()"
+            style="background: white; color: black; border: 1px solid black"
+          >
+            Cancel
+          </button>
+          <button id="confirmAdd">Add to Vault</button>
+        </div>
+      </div>
+    </div>
 
     <script src="script.js"></script>
   </body>
