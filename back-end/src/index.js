@@ -19,7 +19,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error(err));
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5001; // Use 5001 instead of 5000 (5000 is often taken by AirPlay on macOS)
 
 // Middleware
 app.use(cors()); // Allow frontend to access this API

@@ -253,31 +253,31 @@
         </div>
         <div class="info-body">
           <div>
-            <p class="vault-stats-title" style="text-align: center; margin-bottom: 20px;">25 items total</p>
+            <p class="vault-stats-title" id="vault-stats-total" style="text-align: center; margin-bottom: 20px;">Loading...</p>
             <div class="vault-grid">
               <div class="stat-item">
                 <div style="font-size: 28px;">🎓</div>
-                <div class="stat-number">1</div>
+                <div class="stat-number" id="vault-stat-degrees">0</div>
                 <div class="stat-label">Degree</div>
               </div>
               <div class="stat-item">
                 <div style="font-size: 28px;">💼</div>
-                <div class="stat-number">3</div>
+                <div class="stat-number" id="vault-stat-experiences">0</div>
                 <div class="stat-label">Experiences</div>
               </div>
               <div class="stat-item">
                 <div style="font-size: 28px;">🚀</div>
-                <div class="stat-number">5</div>
+                <div class="stat-number" id="vault-stat-projects">0</div>
                 <div class="stat-label">Projects</div>
               </div>
               <div class="stat-item">
                 <div style="font-size: 28px;">🛠️</div>
-                <div class="stat-number">12</div>
+                <div class="stat-number" id="vault-stat-skills">0</div>
                 <div class="stat-label">Skills</div>
               </div>
               <div class="stat-item">
                 <div style="font-size: 28px;">🏆</div>
-                <div class="stat-number">4</div>
+                <div class="stat-number" id="vault-stat-awards">0</div>
                 <div class="stat-label">Awards</div>
               </div>
             </div>
@@ -349,10 +349,15 @@
       <div class="modal-content">
         <h3 id="modalTitle">Add Item</h3>
         <input type="text" id="inTitle" placeholder="Title/Role" />
-        <input type="text" id="inSub" placeholder="Org/Company/Date" />
+        <input type="text" id="inSub" placeholder="Org/Company" />
+        <div style="display: flex; gap: 10px; margin-top: 8px;">
+          <input type="date" id="inStartDate" placeholder="Start Date" style="flex: 1;" />
+          <input type="date" id="inEndDate" placeholder="End Date (optional)" style="flex: 1;" />
+        </div>
         <textarea
           id="inDetails"
           placeholder="Details (one per line)"
+          style="margin-top: 8px;"
         ></textarea>
         <div
           style="
@@ -378,7 +383,7 @@
       // Load education entries from API (make available globally for script.js)
       window.loadEducationEntries = async function loadEducationEntries() {
         try {
-          const response = await fetch("http://localhost:5000/api/education");
+          const response = await fetch("http://localhost:5001/api/education");
           const data = await response.json();
           
           const degreesBody = document.getElementById("degrees-body");
@@ -412,10 +417,10 @@
                 year: "numeric", 
                 month: "short" 
               });
-              const endDateStr = endDate 
-                ? endDate.toLocaleDateString("en-US", { year: "numeric", month: "short" })
-                : "Present";
-              const dateRange = `${startDateStr} - ${endDateStr}`;
+              // Only show end date if it exists
+              const dateRange = endDate 
+                ? `${startDateStr} - ${endDate.toLocaleDateString("en-US", { year: "numeric", month: "short" })}`
+                : startDateStr;
               
               // Build degree title
               const degreeTitle = entry.degree + (entry.fieldOfStudy ? ` in ${entry.fieldOfStudy}` : "");
@@ -479,7 +484,7 @@
       // Load experience entries from API (make available globally for script.js)
       window.loadExperienceEntries = async function loadExperienceEntries() {
         try {
-          const response = await fetch("http://localhost:5000/api/experience");
+          const response = await fetch("http://localhost:5001/api/experience");
           const data = await response.json();
           
           const experiencesBody = document.getElementById("experiences-body");
@@ -513,10 +518,10 @@
                 year: "numeric", 
                 month: "short" 
               });
-              const endDateStr = endDate 
-                ? endDate.toLocaleDateString("en-US", { year: "numeric", month: "short" })
-                : "Present";
-              const dateRange = `${startDateStr} - ${endDateStr}`;
+              // Only show end date if it exists
+              const dateRange = endDate 
+                ? `${startDateStr} - ${endDate.toLocaleDateString("en-US", { year: "numeric", month: "short" })}`
+                : startDateStr;
               
               // Build display HTML
               let html = `<p style="font-weight: bold; font-size: 1.1em">${entry.title}</p>`;
@@ -603,7 +608,7 @@
       // Load project entries from API (make available globally for script.js)
       window.loadProjectEntries = async function loadProjectEntries() {
         try {
-          const response = await fetch("http://localhost:5000/api/projects");
+          const response = await fetch("http://localhost:5001/api/projects");
           const data = await response.json();
           
           const projectsBody = document.getElementById("projects-body");
@@ -637,10 +642,10 @@
                 year: "numeric", 
                 month: "short" 
               });
-              const endDateStr = endDate 
-                ? endDate.toLocaleDateString("en-US", { year: "numeric", month: "short" })
-                : "Present";
-              const dateRange = `${startDateStr} - ${endDateStr}`;
+              // Only show end date if it exists
+              const dateRange = endDate 
+                ? `${startDateStr} - ${endDate.toLocaleDateString("en-US", { year: "numeric", month: "short" })}`
+                : startDateStr;
               
               // Build display HTML
               let html = `<p style="font-weight: bold; font-size: 1.1em">${entry.name}</p>`;
@@ -717,7 +722,7 @@
       // Load skill entries from API (make available globally for script.js)
       window.loadSkillEntries = async function loadSkillEntries() {
         try {
-          const response = await fetch("http://localhost:5000/api/skills");
+          const response = await fetch("http://localhost:5001/api/skills");
           const data = await response.json();
           
           const skillsBody = document.getElementById("skills-body");
@@ -810,7 +815,7 @@
       // Load award entries from API (make available globally for script.js)
       window.loadAwardEntries = async function loadAwardEntries() {
         try {
-          const response = await fetch("http://localhost:5000/api/awards");
+          const response = await fetch("http://localhost:5001/api/awards");
           const data = await response.json();
           
           const awardsBody = document.getElementById("awards-body");
@@ -904,21 +909,62 @@
         }
       }
       
-      // Load all entries when page loads
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-          loadEducationEntries();
-          loadExperienceEntries();
-          loadProjectEntries();
-          loadSkillEntries();
-          loadAwardEntries();
-        });
-      } else {
+      // Load vault statistics from API
+      window.loadVaultStats = async function loadVaultStats() {
+        try {
+          const response = await fetch("http://localhost:5001/api/vault/stats");
+          const data = await response.json();
+          
+          if (data.status === "success" && data.stats) {
+            const stats = data.stats;
+            const total = stats.degrees + stats.experiences + stats.projects + stats.skills + stats.awards;
+            
+            // Update stats display
+            const totalElement = document.getElementById("vault-stats-total");
+            if (totalElement) {
+              totalElement.textContent = `${total} items total`;
+            }
+            
+            const degreesNum = document.getElementById("vault-stat-degrees");
+            const experiencesNum = document.getElementById("vault-stat-experiences");
+            const projectsNum = document.getElementById("vault-stat-projects");
+            const skillsNum = document.getElementById("vault-stat-skills");
+            const awardsNum = document.getElementById("vault-stat-awards");
+            
+            if (degreesNum) degreesNum.textContent = stats.degrees;
+            if (experiencesNum) experiencesNum.textContent = stats.experiences;
+            if (projectsNum) projectsNum.textContent = stats.projects;
+            if (skillsNum) skillsNum.textContent = stats.skills;
+            if (awardsNum) awardsNum.textContent = stats.awards;
+          }
+        } catch (error) {
+          console.error("Error loading vault stats:", error);
+          // Set to 0 if API fails
+          const totalElement = document.getElementById("vault-stats-total");
+          if (totalElement) {
+            totalElement.textContent = "0 items total";
+          }
+          // Stats are already 0 by default, so no need to update them
+        }
+      };
+      
+      // Unified function to load all vault data
+      window.loadAllVaultData = function loadAllVaultData() {
         loadEducationEntries();
         loadExperienceEntries();
         loadProjectEntries();
         loadSkillEntries();
         loadAwardEntries();
+        loadVaultStats(); // Also load stats
+      };
+      
+      // Load all entries when page loads
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          loadAllVaultData();
+        });
+      } else {
+        loadAllVaultData();
       }
     </script>
   </body>

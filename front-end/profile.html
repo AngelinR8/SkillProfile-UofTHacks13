@@ -203,6 +203,78 @@
         margin-bottom: 15px;
         font-size: 15px;
       }
+      
+      /* EDIT MODAL STYLING */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .modal-content {
+        background-color: white;
+        padding: 30px;
+        border: 2px solid black;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+        font-family: "Courier New", Courier, monospace;
+      }
+      
+      .modal-header {
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-size: 16px;
+      }
+      
+      .modal-body {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .modal-body label {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      
+      .modal-body input,
+      .modal-body textarea {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 14px;
+      }
+      
+      .modal-body textarea {
+        min-height: 80px;
+        resize: vertical;
+      }
+      
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      
+      .link-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      
+      .link-item input[type="text"] {
+        flex: 1;
+      }
     </style>
   </head>
 
@@ -237,7 +309,7 @@
       <div class="info-card">
         <div class="info-header">
           <span>PERSONAL INFORMATION</span>
-          <button>Edit Info</button>
+          <button id="editInfoBtn">Edit Info</button>
         </div>
         <div class="info-body">
           <div class="photo-section">
@@ -247,28 +319,20 @@
             </div>
           </div>
           <div class="details-section">
-            <div class="name-title">Alex Chen</div>
-            <div class="handle">@alexchen</div>
+            <div class="name-title" id="userFullName">Loading...</div>
+            <div class="handle" id="userHandle">@username</div>
             <div class="contact-row">
-              <span class="icon-space">📍</span> Toronto, ON, Canada
+              <span class="icon-space">📍</span> <span id="userLocation">-</span>
             </div>
             <div class="contact-row">
-              <span class="icon-space">✉️</span> alex.chen@mail.utoronto.ca
+              <span class="icon-space">✉️</span> <span id="userEmail">-</span>
             </div>
             <div class="contact-row">
-              <span class="icon-space">📱</span> +1 416-555-0123
+              <span class="icon-space">📱</span> <span id="userPhone">-</span>
             </div>
 
-            <div style="margin-top: 20px">
-              <div class="contact-row">
-                <span class="icon-space">🔗</span> linkedin.com/in/alexchen
-              </div>
-              <div class="contact-row">
-                <span class="icon-space">🔗</span> github.com/alexchen
-              </div>
-              <div class="contact-row">
-                <span class="icon-space">🔗</span> portfolio.alexchen.com
-              </div>
+            <div style="margin-top: 20px" id="userLinksContainer">
+              <!-- Links will be dynamically added here -->
             </div>
           </div>
         </div>
@@ -283,11 +347,8 @@
           </div>
         </div>
         <div id="bio" class="activity-body">
-          <p style="line-height: 1.6; margin-bottom: 20px">
-            Passionate computer science student interested in AI and full-stack
-            development. Love building products that solve real problems.
-            Currently seeking summer 2026 internship opportunities in software
-            engineering.
+          <p id="userSummary" style="line-height: 1.6; margin-bottom: 20px">
+            Loading...
           </p>
           <div class="contact-row">💼 Status: 🟢 Open to Work</div>
           <div class="contact-row">
@@ -300,13 +361,13 @@
         <div class="stat-box">
           <div>
             <p>📚 Identity Vault</p>
-            <p style="margin: 10px 0">15 items</p>
+            <p style="margin: 10px 0" id="profile-vault-total">Loading...</p>
             <div style="text-align: left; font-size: 14px; margin-top: 15px">
-              <p>🎓 1 Degree</p>
-              <p>💼 3 Jobs</p>
-              <p>🚀 5 Projects</p>
-              <p>🛠️ 12 Skills</p>
-              <p>🏆 4 Awards</p>
+              <p>🎓 <span id="profile-vault-degrees">0</span> Degree</p>
+              <p>💼 <span id="profile-vault-experiences">0</span> Jobs</p>
+              <p>🚀 <span id="profile-vault-projects">0</span> Projects</p>
+              <p>🛠️ <span id="profile-vault-skills">0</span> Skills</p>
+              <p>🏆 <span id="profile-vault-awards">0</span> Awards</p>
             </div>
           </div>
           <div class="center-wrap">
@@ -373,6 +434,297 @@
         </button>
       </div>
     </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">Edit Personal Information</div>
+        <div class="modal-body">
+          <div>
+            <label>Full Name *</label>
+            <input type="text" id="editFullName" required />
+          </div>
+          <div>
+            <label>Email</label>
+            <input type="email" id="editEmail" />
+          </div>
+          <div>
+            <label>Phone</label>
+            <input type="tel" id="editPhone" />
+          </div>
+          <div>
+            <label>Location</label>
+            <input type="text" id="editLocation" />
+          </div>
+          <div>
+            <label>Summary</label>
+            <textarea id="editSummary" placeholder="Brief professional summary..."></textarea>
+          </div>
+          <div>
+            <label>Links</label>
+            <div id="linksContainer">
+              <!-- Links will be dynamically added here -->
+            </div>
+            <button type="button" id="addLinkBtn" style="margin-top: 5px; font-size: 12px; padding: 5px 10px;">+ Add Link</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelEditBtn">Cancel</button>
+          <button id="saveEditBtn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Load user profile data
+      async function loadUserProfile() {
+        try {
+          const response = await fetch("http://localhost:5001/api/user/profile");
+          const data = await response.json();
+          
+          if (data.status === "success" && data.user) {
+            const user = data.user;
+            
+            // Update name
+            const nameElement = document.getElementById("userFullName");
+            if (nameElement) {
+              nameElement.textContent = user.fullName || "No name";
+            }
+            
+            // Update email
+            const emailElement = document.getElementById("userEmail");
+            if (emailElement) {
+              emailElement.textContent = user.email || "-";
+            }
+            
+            // Update phone
+            const phoneElement = document.getElementById("userPhone");
+            if (phoneElement) {
+              phoneElement.textContent = user.phone || "-";
+            }
+            
+            // Update location
+            const locationElement = document.getElementById("userLocation");
+            if (locationElement) {
+              locationElement.textContent = user.location || "-";
+            }
+            
+            // Update summary
+            const summaryElement = document.getElementById("userSummary");
+            if (summaryElement) {
+              summaryElement.textContent = user.summary || "No summary available.";
+            }
+            
+            // Update links
+            const linksContainer = document.getElementById("userLinksContainer");
+            if (linksContainer && user.links && user.links.length > 0) {
+              linksContainer.innerHTML = "";
+              user.links.forEach(link => {
+                const linkRow = document.createElement("div");
+                linkRow.className = "contact-row";
+                linkRow.innerHTML = `<span class="icon-space">🔗</span> <a href="${link.url}" target="_blank">${link.url}</a>`;
+                linksContainer.appendChild(linkRow);
+              });
+            } else if (linksContainer) {
+              linksContainer.innerHTML = '<div class="contact-row" style="color: #666;">No links added yet</div>';
+            }
+          }
+        } catch (error) {
+          console.error("Error loading user profile:", error);
+        }
+      }
+      
+      // Edit profile functionality
+      const editModal = document.getElementById("editModal");
+      const editInfoBtn = document.getElementById("editInfoBtn");
+      const cancelEditBtn = document.getElementById("cancelEditBtn");
+      const saveEditBtn = document.getElementById("saveEditBtn");
+      const addLinkBtn = document.getElementById("addLinkBtn");
+      const linksContainer = document.getElementById("linksContainer");
+      
+      let userData = null; // Store current user data
+      
+      // Open edit modal
+      editInfoBtn.addEventListener("click", async function() {
+        // Load current user data
+        try {
+          const response = await fetch("http://localhost:5001/api/user/profile");
+          const data = await response.json();
+          
+          if (data.status === "success" && data.user) {
+            userData = data.user;
+            
+            // Populate form
+            document.getElementById("editFullName").value = userData.fullName || "";
+            document.getElementById("editEmail").value = userData.email || "";
+            document.getElementById("editPhone").value = userData.phone || "";
+            document.getElementById("editLocation").value = userData.location || "";
+            document.getElementById("editSummary").value = userData.summary || "";
+            
+            // Populate links
+            linksContainer.innerHTML = "";
+            if (userData.links && userData.links.length > 0) {
+              userData.links.forEach((link, index) => {
+                const linkItem = document.createElement("div");
+                linkItem.className = "link-item";
+                linkItem.innerHTML = `
+                  <select class="link-platform" style="width: 120px; padding: 8px;">
+                    <option value="linkedin" ${link.platform === "linkedin" ? "selected" : ""}>LinkedIn</option>
+                    <option value="github" ${link.platform === "github" ? "selected" : ""}>GitHub</option>
+                    <option value="twitter" ${link.platform === "twitter" ? "selected" : ""}>Twitter</option>
+                    <option value="personal" ${link.platform === "personal" ? "selected" : ""}>Personal</option>
+                    <option value="other" ${link.platform === "other" ? "selected" : ""}>Other</option>
+                  </select>
+                  <input type="text" class="link-url" value="${link.url}" placeholder="URL" style="flex: 1;" />
+                  <button type="button" class="remove-link-btn" data-index="${index}" style="padding: 5px 10px;">×</button>
+                `;
+                linksContainer.appendChild(linkItem);
+              });
+            }
+            
+            // Add remove link handlers
+            document.querySelectorAll(".remove-link-btn").forEach(btn => {
+              btn.addEventListener("click", function() {
+                btn.parentElement.remove();
+              });
+            });
+            
+            editModal.style.display = "flex";
+          }
+        } catch (error) {
+          console.error("Error loading user data for editing:", error);
+          alert("Failed to load user data. Please try again.");
+        }
+      });
+      
+      // Add link button
+      addLinkBtn.addEventListener("click", function() {
+        const linkItem = document.createElement("div");
+        linkItem.className = "link-item";
+        linkItem.innerHTML = `
+          <select class="link-platform" style="width: 120px; padding: 8px;">
+            <option value="linkedin">LinkedIn</option>
+            <option value="github">GitHub</option>
+            <option value="twitter">Twitter</option>
+            <option value="personal">Personal</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="text" class="link-url" placeholder="URL" style="flex: 1;" />
+          <button type="button" class="remove-link-btn" style="padding: 5px 10px;">×</button>
+        `;
+        linksContainer.appendChild(linkItem);
+        
+        // Add remove handler
+        linkItem.querySelector(".remove-link-btn").addEventListener("click", function() {
+          linkItem.remove();
+        });
+      });
+      
+      // Cancel edit
+      cancelEditBtn.addEventListener("click", function() {
+        editModal.style.display = "none";
+      });
+      
+      // Close modal when clicking outside
+      editModal.addEventListener("click", function(e) {
+        if (e.target === editModal) {
+          editModal.style.display = "none";
+        }
+      });
+      
+      // Save edit
+      saveEditBtn.addEventListener("click", async function() {
+        const fullName = document.getElementById("editFullName").value.trim();
+        if (!fullName) {
+          alert("Full name is required");
+          return;
+        }
+        
+        // Collect links
+        const links = [];
+        document.querySelectorAll(".link-item").forEach(item => {
+          const platform = item.querySelector(".link-platform").value;
+          const url = item.querySelector(".link-url").value.trim();
+          if (platform && url) {
+            links.push({ platform, url });
+          }
+        });
+        
+        const updateData = {
+          fullName: fullName,
+          email: document.getElementById("editEmail").value.trim() || undefined,
+          phone: document.getElementById("editPhone").value.trim() || undefined,
+          location: document.getElementById("editLocation").value.trim() || undefined,
+          summary: document.getElementById("editSummary").value.trim() || undefined,
+          links: links
+        };
+        
+        try {
+          const response = await fetch("http://localhost:5001/api/user/profile", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updateData)
+          });
+          
+          const result = await response.json();
+          
+          if (result.status === "success") {
+            editModal.style.display = "none";
+            // Reload user profile
+            loadUserProfile();
+          } else {
+            alert(`Error updating profile: ${result.message || "Unknown error"}`);
+          }
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          alert("Failed to update profile. Please try again.");
+        }
+      });
+      
+      // Load vault statistics for profile page
+      async function loadVaultStats() {
+        try {
+          const response = await fetch("http://localhost:5001/api/vault/stats");
+          const data = await response.json();
+          
+          if (data.status === "success" && data.stats) {
+            const stats = data.stats;
+            const total = stats.degrees + stats.experiences + stats.projects + stats.skills + stats.awards;
+            
+            const totalElement = document.getElementById("profile-vault-total");
+            if (totalElement) {
+              totalElement.textContent = `${total} items`;
+            }
+            
+            const degreesNum = document.getElementById("profile-vault-degrees");
+            const experiencesNum = document.getElementById("profile-vault-experiences");
+            const projectsNum = document.getElementById("profile-vault-projects");
+            const skillsNum = document.getElementById("profile-vault-skills");
+            const awardsNum = document.getElementById("profile-vault-awards");
+            
+            if (degreesNum) degreesNum.textContent = stats.degrees;
+            if (experiencesNum) experiencesNum.textContent = stats.experiences;
+            if (projectsNum) projectsNum.textContent = stats.projects;
+            if (skillsNum) skillsNum.textContent = stats.skills;
+            if (awardsNum) awardsNum.textContent = stats.awards;
+          }
+        } catch (error) {
+          console.error("Error loading vault stats:", error);
+          // Keep default values if API fails
+        }
+      }
+      
+      // Load profile when page loads
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          loadUserProfile();
+          loadVaultStats();
+        });
+      } else {
+        loadUserProfile();
+        loadVaultStats();
+      }
+    </script>
 
     <script src="script.js"></script>
   </body>

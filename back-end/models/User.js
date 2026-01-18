@@ -23,14 +23,14 @@ const UserSchema = new mongoose.Schema({
   // Links stored as array for flexibility
   links: [{
     platform: {
-      type: String,
+    type: String,
       enum: ["linkedin", "github", "twitter", "personal", "other"],
       required: true
-    },
+  },
     url: {
-      type: String,
+    type: String,
       required: true,
-      trim: true
+    trim: true
     }
   }],
   summary: { 

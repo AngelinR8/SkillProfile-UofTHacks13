@@ -1,6 +1,6 @@
 // Load skills from API
 function loadSkills() {
-  fetch("http://localhost:5000/api/skills")
+  fetch("http://localhost:5001/api/skills")
     .then((res) => res.json())
     .then((data) => {
       const list = document.getElementById("skillsList");
@@ -28,7 +28,7 @@ function addSkill() {
     proficiency: "intermediate", // Default proficiency
   };
 
-  fetch("http://localhost:5000/api/skills", {
+  fetch("http://localhost:5001/api/skills", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ skill }),
@@ -106,6 +106,8 @@ document.addEventListener("DOMContentLoaded", function () {
     modal.style.display = "none";
     document.getElementById("inTitle").value = "";
     document.getElementById("inSub").value = "";
+    document.getElementById("inStartDate").value = "";
+    document.getElementById("inEndDate").value = "";
     document.getElementById("inDetails").value = "";
     activeEntryType = null;
   };
@@ -114,6 +116,8 @@ document.addEventListener("DOMContentLoaded", function () {
   confirmBtn.addEventListener("click", async function () {
     const title = document.getElementById("inTitle").value.trim();
     const sub = document.getElementById("inSub").value.trim();
+    const startDateInput = document.getElementById("inStartDate").value;
+    const endDateInput = document.getElementById("inEndDate").value;
     const details = document.getElementById("inDetails").value.trim();
 
     if (!title) return alert("Please enter a title");
@@ -148,16 +152,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       if (activeEntryType === "education") {
-        // Education: title = degree, sub = institution, details = fieldOfStudy (or bullets)
+        // Education: title = degree, sub = institution, details = fieldOfStudy (first line) + description (remaining lines)
         // Required: institution, degree, fieldOfStudy
         apiEndpoint = "/api/education";
+        const detailsLines = details.split("\n").filter(line => line.trim());
+        const fieldOfStudy = detailsLines[0] || null;
+        const description = detailsLines.length > 1 ? detailsLines.slice(1).join("\n") : null;
+        
         apiData = {
-          institution: sub || title, // Fallback to title if sub is empty
+          institution: sub || "Unknown Institution", // Fallback if sub is empty
           degree: title,
-          fieldOfStudy: details.split("\n")[0] || "General",
-          startDate: new Date().toISOString(), // Default to today
+          fieldOfStudy: fieldOfStudy || "General",
+          startDate: startDateInput ? new Date(startDateInput).toISOString() : new Date().toISOString(),
+          endDate: endDateInput ? new Date(endDateInput).toISOString() : null,
           gpa: null
         };
+        
+        // Add description if provided (from remaining lines in details)
+        if (description) {
+          apiData.description = description;
+        }
+        
         // Try to parse GPA from details if present
         const gpaMatch = details.match(/GPA[:\s]*([0-9.]+)/i);
         if (gpaMatch) apiData.gpa = parseFloat(gpaMatch[1]);
@@ -172,7 +187,8 @@ document.addEventListener("DOMContentLoaded", function () {
           company: company || sub || "",
           location: location || "",
           employmentType: "full-time", // Default
-          startDate: new Date().toISOString(),
+          startDate: startDateInput ? new Date(startDateInput).toISOString() : new Date().toISOString(),
+          endDate: endDateInput ? new Date(endDateInput).toISOString() : null,
           bullets: details ? details.split("\n").filter(l => l.trim()) : []
         };
         
@@ -183,7 +199,8 @@ document.addEventListener("DOMContentLoaded", function () {
         apiData = {
           name: title,
           description: details || sub || "",
-          startDate: new Date().toISOString(),
+          startDate: startDateInput ? new Date(startDateInput).toISOString() : new Date().toISOString(),
+          endDate: endDateInput ? new Date(endDateInput).toISOString() : null,
           bullets: details ? details.split("\n").filter(l => l.trim()) : []
         };
         
@@ -191,11 +208,19 @@ document.addEventListener("DOMContentLoaded", function () {
         // Skill: title = name, sub = category | proficiency, details = years
         // Required: name, category, proficiency
         apiEndpoint = "/api/skills";
+        const validCategories = ["programming", "framework", "tool", "language", "soft-skill", "other"];
+        const validProficiencies = ["beginner", "intermediate", "advanced", "expert"];
+        
         const [category, proficiency] = sub.split(" | ").map(s => s.trim().toLowerCase());
+        // Validate category - must be in enum list
+        const validCategory = validCategories.includes(category) ? category : "other";
+        // Validate proficiency - must be in enum list
+        const validProficiency = validProficiencies.includes(proficiency) ? proficiency : "intermediate";
+        
         apiData = {
           name: title,
-          category: category || "other",
-          proficiency: proficiency || "intermediate",
+          category: validCategory,
+          proficiency: validProficiency,
           yearsOfExperience: details ? parseInt(details) || null : null
         };
         
@@ -204,16 +229,18 @@ document.addEventListener("DOMContentLoaded", function () {
         // Required: title, date
         apiEndpoint = "/api/awards";
         const [issuer, dateStr] = sub.split(" | ").map(s => s.trim());
+        // For awards, use startDateInput as the date, or parse from sub field
+        const awardDate = startDateInput ? new Date(startDateInput) : (dateStr ? new Date(dateStr) : new Date());
         apiData = {
           title: title,
           issuer: issuer || "",
-          date: dateStr ? new Date(dateStr).toISOString() : new Date().toISOString(),
+          date: awardDate.toISOString(),
           description: details || ""
         };
       }
 
       // Call API to create entry
-      const response = await fetch(`http://localhost:5000${apiEndpoint}`, {
+      const response = await fetch(`http://localhost:5001${apiEndpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(apiData)
@@ -291,7 +318,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         
         // Call DELETE API
-        fetch(`http://localhost:5000${endpoint}/${entryId}`, {
+        fetch(`http://localhost:5001${endpoint}/${entryId}`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" }
         })
@@ -340,6 +367,160 @@ document.addEventListener("DOMContentLoaded", function () {
         buttonText.includes("💾 Save")
       ) {
         const isEditing = entry.contentEditable === "true";
+        const entryId = entry.getAttribute("data-id");
+        const entryType = entry.getAttribute("data-type");
+        
+        // If clicking Save (currently editing), save to API
+        if (isEditing) {
+          if (!entryId || !entryType) {
+            alert("Cannot save: missing entry ID or type");
+            entry.contentEditable = false;
+            entry.style.backgroundColor = "white";
+            entry.style.outline = "none";
+            button.innerText = "✏️ Edit";
+            return;
+          }
+          
+          // Parse DOM content and extract structured data
+          const paragraphs = Array.from(entry.querySelectorAll("p"));
+          const lists = Array.from(entry.querySelectorAll("ul"));
+          
+          // Remove action buttons from text extraction
+          const actionRow = entry.querySelector(".action-row");
+          if (actionRow) actionRow.remove();
+          
+          // Extract text content from paragraphs (first p is usually title)
+          const titleText = paragraphs[0] ? paragraphs[0].innerText.trim() : "";
+          const subText = paragraphs[1] ? paragraphs[1].innerText.trim() : "";
+          
+          // Extract bullets from lists
+          const bullets = [];
+          lists.forEach(list => {
+            const listItems = Array.from(list.querySelectorAll("li"));
+            listItems.forEach(li => {
+              bullets.push(li.innerText.trim());
+            });
+          });
+          
+          // Build update payload based on entry type
+          const apiEndpoints = {
+            "education": "/api/education",
+            "experience": "/api/experience",
+            "project": "/api/projects",
+            "skill": "/api/skills",
+            "award": "/api/awards"
+          };
+          
+          const endpoint = apiEndpoints[entryType];
+          if (!endpoint) {
+            alert(`Unknown entry type: ${entryType}`);
+            return;
+          }
+          
+          let updateData = {};
+          
+          if (entryType === "education") {
+            // Parse: "Degree in Field" -> degree, fieldOfStudy
+            // Institution from second line
+            const degreeMatch = titleText.match(/^(.+?)(?:\s+in\s+(.+))?$/);
+            updateData = {
+              degree: degreeMatch ? (degreeMatch[2] ? degreeMatch[1].trim() : degreeMatch[1].trim()) : titleText,
+              fieldOfStudy: degreeMatch && degreeMatch[2] ? degreeMatch[2].trim() : "General",
+              institution: subText || ""
+            };
+            // Try to parse GPA from details
+            const gpaMatch = paragraphs.find(p => p.innerText.includes("GPA"));
+            if (gpaMatch) {
+              const gpaValue = gpaMatch.innerText.match(/GPA[:\s]*([0-9.]+)/i);
+              if (gpaValue) updateData.gpa = parseFloat(gpaValue[1]);
+            }
+          } else if (entryType === "experience") {
+            updateData = {
+              title: titleText || ""
+            };
+            if (subText) {
+              const parts = subText.split(" • ");
+              updateData.company = parts[0] || "";
+              updateData.location = parts[1] || "";
+            }
+            if (bullets.length > 0) updateData.bullets = bullets;
+          } else if (entryType === "project") {
+            updateData = {
+              name: titleText || "",
+              description: subText || ""
+            };
+            if (bullets.length > 0) updateData.bullets = bullets;
+          } else if (entryType === "skill") {
+            updateData = {
+              name: titleText || ""
+            };
+            if (subText) {
+              const parts = subText.split(" | ");
+              updateData.category = parts[0] ? parts[0].toLowerCase() : "other";
+              updateData.proficiency = parts[1] ? parts[1].toLowerCase() : "intermediate";
+            }
+          } else if (entryType === "award") {
+            updateData = {
+              title: titleText || ""
+            };
+            if (subText) {
+              const parts = subText.split(" | ");
+              updateData.issuer = parts[0] || "";
+            }
+            // Extract description from remaining paragraphs
+            if (paragraphs.length > 2) {
+              const descText = paragraphs.slice(2).map(p => p.innerText.trim()).join("\n");
+              if (descText) updateData.description = descText;
+            }
+          }
+          
+          // Call PUT API
+          fetch(`http://localhost:5001${endpoint}/${entryId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updateData)
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.status === "success") {
+                // Reload the section to show updated content
+                const reloadFunctions = {
+                  "education": () => { if (window.loadEducationEntries) window.loadEducationEntries(); },
+                  "experience": () => { if (window.loadExperienceEntries) window.loadExperienceEntries(); },
+                  "project": () => { if (window.loadProjectEntries) window.loadProjectEntries(); },
+                  "skill": () => { if (window.loadSkillEntries) window.loadSkillEntries(); },
+                  "award": () => { if (window.loadAwardEntries) window.loadAwardEntries(); }
+                };
+                
+                const reloadFunc = reloadFunctions[entryType];
+                if (reloadFunc) {
+                  reloadFunc();
+                }
+              } else {
+                alert(`Error updating entry: ${data.message || "Unknown error"}`);
+                // Restore editing state if error
+                entry.contentEditable = true;
+                entry.style.backgroundColor = "#fffdf0";
+                entry.style.outline = "1px dashed black";
+                button.innerText = "💾 Save";
+                if (actionRow) entry.appendChild(actionRow);
+              }
+            })
+            .catch((error) => {
+              console.error("Error updating entry:", error);
+              alert("Failed to update entry. Please try again.");
+              // Restore editing state if error
+              entry.contentEditable = true;
+              entry.style.backgroundColor = "#fffdf0";
+              entry.style.outline = "1px dashed black";
+              button.innerText = "💾 Save";
+              if (actionRow) entry.appendChild(actionRow);
+            });
+          
+          return; // Exit early, reload will handle UI reset
+        }
+        
+        // Toggle editing state (entering edit mode)
         entry.contentEditable = !isEditing;
         entry.style.backgroundColor = !isEditing ? "#fffdf0" : "white";
         entry.style.outline = !isEditing ? "1px dashed black" : "none";

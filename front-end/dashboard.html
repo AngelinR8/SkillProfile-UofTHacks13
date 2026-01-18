@@ -381,10 +381,10 @@
       // Load vault statistics from API
       async function loadVaultStats() {
         try {
-          const response = await fetch("http://localhost:5000/api/vault/stats");
+          const response = await fetch("http://localhost:5001/api/vault/stats");
           const data = await response.json();
           
-          if (data.stats) {
+          if (data.status === "success" && data.stats) {
             const stats = data.stats;
             
             // Update dashboard stats
@@ -399,10 +399,34 @@
             if (projectsNum) projectsNum.textContent = stats.projects;
             if (skillsNum) skillsNum.textContent = stats.skills;
             if (awardsNum) awardsNum.textContent = stats.awards;
+          } else {
+            // If API returns error or no data, set all stats to 0
+            const degreesNum = document.getElementById("stat-degrees-num");
+            const experiencesNum = document.getElementById("stat-experiences-num");
+            const projectsNum = document.getElementById("stat-projects-num");
+            const skillsNum = document.getElementById("stat-skills-num");
+            const awardsNum = document.getElementById("stat-awards-num");
+            
+            if (degreesNum) degreesNum.textContent = "0";
+            if (experiencesNum) experiencesNum.textContent = "0";
+            if (projectsNum) projectsNum.textContent = "0";
+            if (skillsNum) skillsNum.textContent = "0";
+            if (awardsNum) awardsNum.textContent = "0";
           }
         } catch (error) {
           console.error("Error loading vault stats:", error);
-          // Keep default values if API fails
+          // Set all stats to 0 if API call fails
+          const degreesNum = document.getElementById("stat-degrees-num");
+          const experiencesNum = document.getElementById("stat-experiences-num");
+          const projectsNum = document.getElementById("stat-projects-num");
+          const skillsNum = document.getElementById("stat-skills-num");
+          const awardsNum = document.getElementById("stat-awards-num");
+          
+          if (degreesNum) degreesNum.textContent = "0";
+          if (experiencesNum) experiencesNum.textContent = "0";
+          if (projectsNum) projectsNum.textContent = "0";
+          if (skillsNum) skillsNum.textContent = "0";
+          if (awardsNum) awardsNum.textContent = "0";
         }
       }
 
