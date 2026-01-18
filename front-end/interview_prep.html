@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interview Prep - OneProfile</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        padding-bottom: 40px;
+      }
+
+      /* HEADER / TOP BAR */
+      header {
+        background-color: #333;
+        color: white;
+        padding: 20px;
+        width: 100%;
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .search-input {
+        max-width: 300px;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .profile-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .profile-picture {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+      }
+
+      /* MAIN CONTAINER */
+      .main-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 20px;
+      }
+
+      /* PAGE TITLE */
+      .page-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 30px;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      /* JOB DESCRIPTION CARD */
+      .job-description-card {
+        background: white;
+        border: 1px solid black;
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 30px;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        padding: 12px 20px;
+        border-bottom: 1px solid black;
+        font-size: 14px;
+        font-weight: bold;
+        background-color: #f9f9f9;
+      }
+
+      .card-body {
+        padding: 30px;
+      }
+
+      .job-input-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #555;
+      }
+
+      .job-description-textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        resize: vertical;
+        margin-bottom: 20px;
+      }
+
+      .job-description-textarea:focus {
+        outline: 2px solid #333;
+      }
+
+      .example-description {
+        background-color: #f5f5f5;
+        border: 1px dashed #ccc;
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: #666;
+      }
+
+      .start-button-container {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 14px;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background-color: #555;
+      }
+
+      button:disabled {
+        background-color: #999;
+        cursor: not-allowed;
+      }
+
+      /* INTERVIEW CHAT SECTION */
+      .interview-chat-card {
+        background: white;
+        border: 1px solid black;
+        font-family: "Courier New", Courier, monospace;
+        display: none;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+      }
+
+      .interview-chat-card.active {
+        display: block;
+      }
+
+      .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid black;
+        background-color: #f9f9f9;
+      }
+
+      .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .chat-header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .end-session-btn {
+        background-color: #d32f2f;
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .end-session-btn:hover {
+        background-color: #b71c1c;
+      }
+
+      .copy-icon {
+        cursor: pointer;
+        font-size: 16px;
+        color: #666;
+      }
+
+      .copy-icon:hover {
+        color: #333;
+      }
+
+      .chat-messages {
+        padding: 20px;
+        min-height: 400px;
+        max-height: 500px;
+        overflow-y: auto;
+        background-color: #fafafa;
+      }
+
+      .message {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 12px;
+      }
+
+      .message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        background-color: #e0e0e0;
+      }
+
+      .message-content {
+        flex: 1;
+      }
+
+      .message-sender {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 13px;
+      }
+
+      .message-text {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #333;
+      }
+
+      .message-time {
+        font-size: 11px;
+        color: #999;
+        margin-top: 5px;
+      }
+
+      .ai-message .message-avatar {
+        background-color: #2196f3;
+        color: white;
+      }
+
+      .user-message .message-avatar {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      .chat-input-area {
+        padding: 20px;
+        border-top: 1px solid #ccc;
+        display: flex;
+        gap: 10px;
+        background-color: white;
+      }
+
+      .chat-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+      }
+
+      .chat-input:focus {
+        outline: 2px solid #333;
+      }
+
+      .send-button {
+        padding: 10px 20px;
+        white-space: nowrap;
+      }
+
+      /* FEEDBACK SECTION */
+      .feedback-card {
+        background: white;
+        border: 1px solid black;
+        font-family: "Courier New", Courier, monospace;
+        display: none;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+      }
+
+      .feedback-card.active {
+        display: block;
+      }
+
+      .feedback-body {
+        padding: 30px;
+      }
+
+      .feedback-section {
+        margin-bottom: 25px;
+      }
+
+      .feedback-section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      .rating-stars {
+        display: flex;
+        gap: 5px;
+        margin: 8px 0;
+      }
+
+      .star {
+        font-size: 20px;
+        color: #ffd700;
+      }
+
+      .star.empty {
+        color: #ddd;
+      }
+
+      .feedback-list {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .feedback-list li {
+        margin-bottom: 8px;
+        padding-left: 20px;
+        position: relative;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .feedback-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #333;
+      }
+
+      .feedback-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #ccc;
+      }
+
+      .back-button-container {
+        text-align: center;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="header-content">
+        <h1>OneProfile</h1>
+        <input type="text" placeholder="Search..." class="search-input" />
+        <div class="header-right">
+          <div class="profile-nav">
+            <img
+              src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg"
+              class="profile-picture"
+              alt="Profile"
+            />
+            <p>Alex</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <div class="page-title">
+        <span>🎤</span>
+        <span>Interview Prep</span>
+      </div>
+
+      <!-- Job Description Input Card -->
+      <div class="job-description-card" id="jobDescriptionCard">
+        <div class="card-header">JOB DESCRIPTION INPUT</div>
+        <div class="card-body">
+          <div class="job-input-label">
+            <span>✏️</span>
+            <span>Describe the position you're interviewing for:</span>
+          </div>
+          <textarea
+            class="job-description-textarea"
+            id="jobDescriptionInput"
+            placeholder="Enter job description here...&#10;&#10;Example:&#10;Company: Google&#10;Position: Software Engineering Intern&#10;Responsibilities: Backend development, API design, work with distributed systems..."
+          ></textarea>
+          <div class="example-description" id="exampleDescription">
+            <strong>Example:</strong><br />
+            Company: Google<br />
+            Position: Software Engineering Intern<br />
+            Responsibilities: Backend development, API design, work with
+            distributed systems...
+          </div>
+          <div class="start-button-container">
+            <button id="startInterviewBtn">Start Interview Session</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interview Chat Card -->
+      <div class="interview-chat-card" id="interviewChatCard">
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <span>🤖</span>
+            <span>AI INTERVIEW SIMULATOR</span>
+          </div>
+          <div class="chat-header-right">
+            <span class="copy-icon" title="Copy session">📋</span>
+            <button class="end-session-btn" id="endSessionBtn">
+              End Session
+            </button>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+          <input
+            type="text"
+            class="chat-input"
+            id="chatInput"
+            placeholder="Type your response..."
+          />
+          <button class="send-button" id="sendMessageBtn">Send →</button>
+        </div>
+      </div>
+
+      <!-- Feedback Card -->
+      <div class="feedback-card" id="feedbackCard">
+        <div class="card-header">
+          <span>📊</span>
+          <span>INTERVIEW FEEDBACK & SUMMARY</span>
+        </div>
+        <div class="feedback-body">
+          <div class="feedback-section">
+            <div class="feedback-section-title">Overall Performance:</div>
+            <div class="rating-stars" id="ratingStars"></div>
+            <span id="ratingText"></span>
+          </div>
+
+          <div class="feedback-section">
+            <div class="feedback-section-title">
+              <span>✅</span>
+              <span>Strengths:</span>
+            </div>
+            <ul class="feedback-list" id="strengthsList"></ul>
+          </div>
+
+          <div class="feedback-section">
+            <div class="feedback-section-title">
+              <span>💡</span>
+              <span>Areas for Improvement:</span>
+            </div>
+            <ul class="feedback-list" id="improvementsList"></ul>
+          </div>
+
+          <div class="feedback-section">
+            <div class="feedback-section-title">
+              <span>📝</span>
+              <span>Recommended Actions:</span>
+            </div>
+            <ul class="feedback-list" id="actionsList"></ul>
+          </div>
+
+          <div class="feedback-actions">
+            <button id="saveFeedbackBtn">Save Feedback</button>
+            <button id="newSessionBtn">New Session</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="back-button-container">
+        <button onclick="location.href = 'dashboard.html'">
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // State management
+      let interviewStarted = false;
+      let interviewEnded = false;
+      let messageCount = 0;
+
+      // DOM Elements
+      const jobDescriptionCard = document.getElementById("jobDescriptionCard");
+      const jobDescriptionInput = document.getElementById("jobDescriptionInput");
+      const exampleDescription = document.getElementById("exampleDescription");
+      const startInterviewBtn = document.getElementById("startInterviewBtn");
+      const interviewChatCard = document.getElementById("interviewChatCard");
+      const chatMessages = document.getElementById("chatMessages");
+      const chatInput = document.getElementById("chatInput");
+      const sendMessageBtn = document.getElementById("sendMessageBtn");
+      const endSessionBtn = document.getElementById("endSessionBtn");
+      const feedbackCard = document.getElementById("feedbackCard");
+
+      // Initialize interview with example AI greeting
+      function startInterview() {
+        const jobDescription = jobDescriptionInput.value.trim();
+        if (!jobDescription) {
+          alert("Please enter a job description before starting the interview.");
+          return;
+        }
+
+        interviewStarted = true;
+        interviewEnded = false;
+        messageCount = 0;
+
+        // Hide job description card and show chat
+        jobDescriptionCard.style.display = "none";
+        interviewChatCard.classList.add("active");
+
+        // Clear previous messages
+        chatMessages.innerHTML = "";
+
+        // Add initial AI greeting
+        addAIMessage(
+          `Hello Alex! I'll be conducting your interview for the position you described. Based on your Identity Vault, I can see your relevant experience. Let's begin. Can you tell me about a challenging technical project you've worked on?`
+        );
+
+        // Focus on chat input
+        chatInput.focus();
+      }
+
+      // Add AI message to chat
+      function addAIMessage(text) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "message ai-message";
+        const timeAgo = getTimeAgo();
+        messageDiv.innerHTML = `
+          <div class="message-avatar">🤖</div>
+          <div class="message-content">
+            <div class="message-sender">AI Interviewer:</div>
+            <div class="message-text">${text}</div>
+            <div class="message-time">${timeAgo}</div>
+          </div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Add user message to chat
+      function addUserMessage(text) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "message user-message";
+        const timeAgo = getTimeAgo();
+        messageDiv.innerHTML = `
+          <div class="message-avatar">👤</div>
+          <div class="message-content">
+            <div class="message-sender">You:</div>
+            <div class="message-text">${text}</div>
+            <div class="message-time">${timeAgo}</div>
+          </div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Get time ago string
+      function getTimeAgo() {
+        messageCount++;
+        if (messageCount === 1) return "2 min ago";
+        if (messageCount === 2) return "1 min ago";
+        return "Just now";
+      }
+
+      // Send user message
+      function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addUserMessage(message);
+        chatInput.value = "";
+
+        // Simulate AI response (in real implementation, this would call the API)
+        setTimeout(() => {
+          const responses = [
+            "Interesting! What specific algorithms did you use and why did you choose them?",
+            "That's a great example. Can you tell me more about how you handled any challenges you faced?",
+            "I see. How would you approach a similar problem if you had to do it again?",
+            "Excellent. Now, let's talk about system design. How would you design a distributed caching system?",
+            "Good point. What would you do differently if you had more time?",
+          ];
+          const randomResponse =
+            responses[Math.floor(Math.random() * responses.length)];
+          addAIMessage(randomResponse);
+        }, 1000);
+      }
+
+      // End interview session
+      function endSession() {
+        if (!interviewStarted) return;
+
+        if (
+          confirm(
+            "Are you sure you want to end the interview session? You will receive feedback based on your responses."
+          )
+        ) {
+          interviewEnded = true;
+          interviewChatCard.classList.remove("active");
+          showFeedback();
+        }
+      }
+
+      // Show feedback card
+      function showFeedback() {
+        feedbackCard.classList.add("active");
+
+        // Generate sample feedback
+        const rating = 4;
+        const ratingStarsHtml = Array(5)
+          .fill(0)
+          .map((_, i) => {
+            if (i < rating) {
+              return '<span class="star">★</span>';
+            } else {
+              return '<span class="star empty">☆</span>';
+            }
+          })
+          .join("");
+
+        document.getElementById("ratingStars").innerHTML = ratingStarsHtml;
+        document.getElementById("ratingText").textContent = `(${rating}/5)`;
+
+        document.getElementById("strengthsList").innerHTML = `
+          <li>Strong technical foundation in algorithms</li>
+          <li>Good communication of complex concepts</li>
+          <li>Relevant project experience demonstrated</li>
+        `;
+
+        document.getElementById("improvementsList").innerHTML = `
+          <li>Could elaborate more on system design decisions</li>
+          <li>Practice STAR method for behavioral questions</li>
+        `;
+
+        document.getElementById("actionsList").innerHTML = `
+          <li>Review distributed systems concepts</li>
+          <li>Prepare 2-3 more behavioral examples</li>
+        `;
+      }
+
+      // Save feedback
+      function saveFeedback() {
+        alert("Feedback saved! You can view it in your dashboard.");
+      }
+
+      // Start new session
+      function newSession() {
+        interviewStarted = false;
+        interviewEnded = false;
+        messageCount = 0;
+        jobDescriptionInput.value = "";
+        jobDescriptionCard.style.display = "block";
+        interviewChatCard.classList.remove("active");
+        feedbackCard.classList.remove("active");
+        chatMessages.innerHTML = "";
+        jobDescriptionInput.focus();
+      }
+
+      // Event listeners
+      startInterviewBtn.addEventListener("click", startInterview);
+
+      sendMessageBtn.addEventListener("click", sendMessage);
+      chatInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          sendMessage();
+        }
+      });
+
+      endSessionBtn.addEventListener("click", endSession);
+      document.getElementById("saveFeedbackBtn").addEventListener("click", saveFeedback);
+      document.getElementById("newSessionBtn").addEventListener("click", newSession);
+
+      // Copy session functionality
+      document.querySelector(".copy-icon").addEventListener("click", () => {
+        const messages = Array.from(chatMessages.querySelectorAll(".message-text")).map(
+          (el) => el.textContent
+        );
+        const sessionText = messages.join("\n\n");
+        navigator.clipboard.writeText(sessionText).then(() => {
+          const copyIcon = document.querySelector(".copy-icon");
+          const original = copyIcon.textContent;
+          copyIcon.textContent = "✓";
+          setTimeout(() => {
+            copyIcon.textContent = original;
+          }, 1000);
+        });
+      });
+
+      // Hide example when user starts typing
+      jobDescriptionInput.addEventListener("input", () => {
+        if (jobDescriptionInput.value.trim()) {
+          exampleDescription.style.display = "none";
+        } else {
+          exampleDescription.style.display = "block";
+        }
+      });
+    </script>
+  </body>
+</html>
