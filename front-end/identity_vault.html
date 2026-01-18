@@ -287,95 +287,51 @@
 
       <div class="info-card">
         <div class="info-header">
-          <span>🎓 DEGREES (1)</span>
+          <span id="degrees-header">🎓 DEGREES (0)</span>
           <button class="add-btn">+ Add Degree</button>
         </div>
-        <div class="info-body">
-          <div class="vault-entry">
-            <p style="font-weight: bold; font-size: 1.1em">
-              Honours BSc in Computer Science & Statistics
-            </p>
-            <p>University of Toronto</p>
-            <p style="color: #666">Sep 2024 - Present | GPA: 3.9</p>
-            <div class="action-row">
-              <button class="btn-outline">✏️ Edit</button>
-              <button class="btn-outline">🗑️ Delete</button>
-              <button class="btn-outline">📋 Copy</button>
-            </div>
-          </div>
+        <div class="info-body" id="degrees-body">
+          <!-- Education entries will be loaded here dynamically -->
         </div>
       </div>
 
       <div class="info-card">
         <div class="info-header">
-          <span>💼 JOBS (3)</span>
-          <button class="add-btn">+ Add Job</button>
+          <span id="experiences-header">💼 EXPERIENCES (0)</span>
+          <button class="add-btn">+ Add Experience</button>
         </div>
-        <div class="info-body">
-          <div class="vault-entry">
-            <p style="font-weight: bold; font-size: 1.1em">
-              Software Engineering Intern
-            </p>
-            <p>Tech Corp Solutions</p>
-            <div class="action-row">
-              <button class="btn-outline">✏️ Edit</button>
-              <button class="btn-outline">🗑️ Delete</button>
-              <button class="btn-outline">📋 Copy</button>
-            </div>
-          </div>
+        <div class="info-body" id="experiences-body">
+          <!-- Experience entries will be loaded here dynamically -->
         </div>
       </div>
 
       <div class="info-card">
         <div class="info-header">
-          <span>🚀 PROJECTS (5)</span>
+          <span id="projects-header">🚀 PROJECTS (0)</span>
           <button class="add-btn">+ Add Project</button>
         </div>
-        <div class="info-body">
-          <div class="vault-entry">
-            <p style="font-weight: bold; font-size: 1.1em">OneProfile</p>
-            <div class="action-row">
-              <button class="btn-outline">✏️ Edit</button>
-              <button class="btn-outline">🗑️ Delete</button>
-              <button class="btn-outline">📋 Copy</button>
-            </div>
-          </div>
+        <div class="info-body" id="projects-body">
+          <!-- Project entries will be loaded here dynamically -->
         </div>
       </div>
 
       <div class="info-card">
         <div class="info-header">
-          <span>🛠️ SKILLS (12)</span>
+          <span id="skills-header">🛠️ SKILLS (0)</span>
           <button class="add-btn">+ Add Skill</button>
         </div>
-        <div class="info-body">
-          <div class="vault-entry">
-            <p style="font-weight: bold">Technical Skills</p>
-            <ul>
-              <li>JavaScript, Python, React, Node.js, SQL, Git</li>
-            </ul>
-            <div class="action-row">
-              <button class="btn-outline">✏️ Edit</button>
-              <button class="btn-outline">🗑️ Delete</button>
-            </div>
-          </div>
+        <div class="info-body" id="skills-body">
+          <!-- Skill entries will be loaded here dynamically -->
         </div>
       </div>
 
       <div class="info-card">
         <div class="info-header">
-          <span>🏆 AWARDS (4)</span>
+          <span id="awards-header">🏆 AWARDS (0)</span>
           <button class="add-btn">+ Add Award</button>
         </div>
-        <div class="info-body">
-          <div class="vault-entry">
-            <p style="font-weight: bold">Dean's List</p>
-            <p>University of Toronto | 2024</p>
-            <div class="action-row">
-              <button class="btn-outline">✏️ Edit</button>
-              <button class="btn-outline">🗑️ Delete</button>
-            </div>
-          </div>
+        <div class="info-body" id="awards-body">
+          <!-- Award entries will be loaded here dynamically -->
         </div>
       </div>
 
@@ -418,5 +374,552 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+      // Load education entries from API (make available globally for script.js)
+      window.loadEducationEntries = async function loadEducationEntries() {
+        try {
+          const response = await fetch("http://localhost:5000/api/education");
+          const data = await response.json();
+          
+          const degreesBody = document.getElementById("degrees-body");
+          const degreesHeader = document.getElementById("degrees-header");
+          
+          if (!degreesBody || !degreesHeader) {
+            console.error("Required DOM elements not found");
+            return;
+          }
+          
+          // Clear existing content
+          degreesBody.innerHTML = "";
+          
+          if (data.status === "success" && data.education && data.education.length > 0) {
+            const educationList = data.education;
+            
+            // Update header with count
+            degreesHeader.textContent = `🎓 DEGREES (${educationList.length})`;
+            
+            // Render each education entry
+            educationList.forEach((entry) => {
+              const entryDiv = document.createElement("div");
+              entryDiv.className = "vault-entry";
+              entryDiv.setAttribute("data-id", entry._id);
+              entryDiv.setAttribute("data-type", "education");
+              
+              // Format date range
+              const startDate = new Date(entry.startDate);
+              const endDate = entry.endDate ? new Date(entry.endDate) : null;
+              const startDateStr = startDate.toLocaleDateString("en-US", { 
+                year: "numeric", 
+                month: "short" 
+              });
+              const endDateStr = endDate 
+                ? endDate.toLocaleDateString("en-US", { year: "numeric", month: "short" })
+                : "Present";
+              const dateRange = `${startDateStr} - ${endDateStr}`;
+              
+              // Build degree title
+              const degreeTitle = entry.degree + (entry.fieldOfStudy ? ` in ${entry.fieldOfStudy}` : "");
+              
+              // Build display HTML
+              let html = `<p style="font-weight: bold; font-size: 1.1em">${degreeTitle}</p>`;
+              html += `<p>${entry.institution}</p>`;
+              
+              const details = [];
+              if (dateRange) details.push(dateRange);
+              if (entry.gpa !== undefined && entry.gpa !== null) {
+                details.push(`GPA: ${entry.gpa}`);
+              }
+              if (details.length > 0) {
+                html += `<p style="color: #666">${details.join(" | ")}</p>`;
+              }
+              
+              // Add description or achievements if available
+              if (entry.description) {
+                html += `<p style="margin-top: 10px">${entry.description}</p>`;
+              }
+              
+              if (entry.achievements && entry.achievements.length > 0) {
+                html += `<ul style="margin-top: 10px; padding-left: 20px">`;
+                entry.achievements.forEach((achievement) => {
+                  html += `<li>${achievement}</li>`;
+                });
+                html += `</ul>`;
+              }
+              
+              // Add action buttons
+              html += `<div class="action-row">
+                <button class="btn-outline">✏️ Edit</button>
+                <button class="btn-outline">🗑️ Delete</button>
+                <button class="btn-outline">📋 Copy</button>
+              </div>`;
+              
+              entryDiv.innerHTML = html;
+              degreesBody.appendChild(entryDiv);
+            });
+          } else {
+            // No education entries - show placeholder
+            degreesHeader.textContent = `🎓 DEGREES (0)`;
+            degreesBody.innerHTML = '<div class="empty-placeholder" style="text-align: center; color: #666; padding: 20px;">No education entries yet. Click "+ Add Degree" to add one.</div>';
+          }
+        } catch (error) {
+          console.error("Error loading education entries:", error);
+          const degreesBody = document.getElementById("degrees-body");
+          const degreesHeader = document.getElementById("degrees-header");
+          
+          if (degreesBody) {
+            degreesBody.innerHTML = '<div class="error-placeholder" style="text-align: center; color: #d32f2f; padding: 20px;">Error loading education entries. Please try again later.</div>';
+          }
+          
+          if (degreesHeader) {
+            degreesHeader.textContent = `🎓 DEGREES (0)`;
+          }
+        }
+      }
+      
+      // Load experience entries from API (make available globally for script.js)
+      window.loadExperienceEntries = async function loadExperienceEntries() {
+        try {
+          const response = await fetch("http://localhost:5000/api/experience");
+          const data = await response.json();
+          
+          const experiencesBody = document.getElementById("experiences-body");
+          const experiencesHeader = document.getElementById("experiences-header");
+          
+          if (!experiencesBody || !experiencesHeader) {
+            console.error("Required DOM elements not found for experiences");
+            return;
+          }
+          
+          // Clear existing content
+          experiencesBody.innerHTML = "";
+          
+          if (data.status === "success" && data.experiences && data.experiences.length > 0) {
+            const experienceList = data.experiences;
+            
+            // Update header with count
+            experiencesHeader.textContent = `💼 EXPERIENCES (${experienceList.length})`;
+            
+            // Render each experience entry
+            experienceList.forEach((entry) => {
+              const entryDiv = document.createElement("div");
+              entryDiv.className = "vault-entry";
+              entryDiv.setAttribute("data-id", entry._id);
+              entryDiv.setAttribute("data-type", "experience");
+              
+              // Format date range
+              const startDate = new Date(entry.startDate);
+              const endDate = entry.endDate ? new Date(entry.endDate) : null;
+              const startDateStr = startDate.toLocaleDateString("en-US", { 
+                year: "numeric", 
+                month: "short" 
+              });
+              const endDateStr = endDate 
+                ? endDate.toLocaleDateString("en-US", { year: "numeric", month: "short" })
+                : "Present";
+              const dateRange = `${startDateStr} - ${endDateStr}`;
+              
+              // Build display HTML
+              let html = `<p style="font-weight: bold; font-size: 1.1em">${entry.title}</p>`;
+              
+              // Company and location
+              const locationInfo = [];
+              if (entry.company) locationInfo.push(entry.company);
+              if (entry.location) locationInfo.push(entry.location);
+              if (locationInfo.length > 0) {
+                html += `<p>${locationInfo.join(" • ")}</p>`;
+              }
+              
+              // Date range and employment type
+              const details = [];
+              if (dateRange) details.push(dateRange);
+              if (entry.employmentType) {
+                const typeMap = {
+                  "full-time": "Full-time",
+                  "part-time": "Part-time",
+                  "contract": "Contract",
+                  "internship": "Internship",
+                  "freelance": "Freelance"
+                };
+                details.push(typeMap[entry.employmentType] || entry.employmentType);
+              }
+              if (details.length > 0) {
+                html += `<p style="color: #666">${details.join(" | ")}</p>`;
+              }
+              
+              // Description if available
+              if (entry.description) {
+                html += `<p style="margin-top: 10px">${entry.description}</p>`;
+              }
+              
+              // Bullets if available
+              if (entry.bullets && entry.bullets.length > 0) {
+                html += `<ul style="margin-top: 10px; padding-left: 20px">`;
+                entry.bullets.forEach((bullet) => {
+                  html += `<li>${bullet}</li>`;
+                });
+                html += `</ul>`;
+              }
+              
+              // Achievements if available
+              if (entry.achievements && entry.achievements.length > 0) {
+                html += `<p style="margin-top: 10px; font-weight: bold">Achievements:</p>`;
+                html += `<ul style="margin-top: 5px; padding-left: 20px">`;
+                entry.achievements.forEach((achievement) => {
+                  html += `<li>${achievement}</li>`;
+                });
+                html += `</ul>`;
+              }
+              
+              // Add action buttons
+              html += `<div class="action-row">
+                <button class="btn-outline">✏️ Edit</button>
+                <button class="btn-outline">🗑️ Delete</button>
+                <button class="btn-outline">📋 Copy</button>
+              </div>`;
+              
+              entryDiv.innerHTML = html;
+              experiencesBody.appendChild(entryDiv);
+            });
+          } else {
+            // No experience entries - show placeholder
+            experiencesHeader.textContent = `💼 EXPERIENCES (0)`;
+            experiencesBody.innerHTML = '<div class="empty-placeholder" style="text-align: center; color: #666; padding: 20px;">No experience entries yet. Click "+ Add Experience" to add one.</div>';
+          }
+        } catch (error) {
+          console.error("Error loading experience entries:", error);
+          const experiencesBody = document.getElementById("experiences-body");
+          const experiencesHeader = document.getElementById("experiences-header");
+          
+          if (experiencesBody) {
+            experiencesBody.innerHTML = '<div class="error-placeholder" style="text-align: center; color: #d32f2f; padding: 20px;">Error loading experience entries. Please try again later.</div>';
+          }
+          
+          if (experiencesHeader) {
+            experiencesHeader.textContent = `💼 EXPERIENCES (0)`;
+          }
+        }
+      }
+      
+      // Load project entries from API (make available globally for script.js)
+      window.loadProjectEntries = async function loadProjectEntries() {
+        try {
+          const response = await fetch("http://localhost:5000/api/projects");
+          const data = await response.json();
+          
+          const projectsBody = document.getElementById("projects-body");
+          const projectsHeader = document.getElementById("projects-header");
+          
+          if (!projectsBody || !projectsHeader) {
+            console.error("Required DOM elements not found for projects");
+            return;
+          }
+          
+          // Clear existing content
+          projectsBody.innerHTML = "";
+          
+          if (data.status === "success" && data.projects && data.projects.length > 0) {
+            const projectList = data.projects;
+            
+            // Update header with count
+            projectsHeader.textContent = `🚀 PROJECTS (${projectList.length})`;
+            
+            // Render each project entry
+            projectList.forEach((entry) => {
+              const entryDiv = document.createElement("div");
+              entryDiv.className = "vault-entry";
+              entryDiv.setAttribute("data-id", entry._id);
+              entryDiv.setAttribute("data-type", "project");
+              
+              // Format date range
+              const startDate = new Date(entry.startDate);
+              const endDate = entry.endDate ? new Date(entry.endDate) : null;
+              const startDateStr = startDate.toLocaleDateString("en-US", { 
+                year: "numeric", 
+                month: "short" 
+              });
+              const endDateStr = endDate 
+                ? endDate.toLocaleDateString("en-US", { year: "numeric", month: "short" })
+                : "Present";
+              const dateRange = `${startDateStr} - ${endDateStr}`;
+              
+              // Build display HTML
+              let html = `<p style="font-weight: bold; font-size: 1.1em">${entry.name}</p>`;
+              
+              // Date range
+              if (dateRange) {
+                html += `<p style="color: #666">${dateRange}</p>`;
+              }
+              
+              // Description if available
+              if (entry.description) {
+                html += `<p style="margin-top: 10px">${entry.description}</p>`;
+              }
+              
+              // Technologies if available
+              if (entry.technologies && entry.technologies.length > 0) {
+                html += `<p style="margin-top: 10px"><strong>Technologies:</strong> ${entry.technologies.join(", ")}</p>`;
+              }
+              
+              // Bullets if available
+              if (entry.bullets && entry.bullets.length > 0) {
+                html += `<ul style="margin-top: 10px; padding-left: 20px">`;
+                entry.bullets.forEach((bullet) => {
+                  html += `<li>${bullet}</li>`;
+                });
+                html += `</ul>`;
+              }
+              
+              // Achievements if available
+              if (entry.achievements && entry.achievements.length > 0) {
+                html += `<p style="margin-top: 10px; font-weight: bold">Achievements:</p>`;
+                html += `<ul style="margin-top: 5px; padding-left: 20px">`;
+                entry.achievements.forEach((achievement) => {
+                  html += `<li>${achievement}</li>`;
+                });
+                html += `</ul>`;
+              }
+              
+              // URL if available
+              if (entry.url) {
+                html += `<p style="margin-top: 10px"><a href="${entry.url}" target="_blank" style="color: #0066cc; text-decoration: underline;">View Project →</a></p>`;
+              }
+              
+              // Add action buttons
+              html += `<div class="action-row">
+                <button class="btn-outline">✏️ Edit</button>
+                <button class="btn-outline">🗑️ Delete</button>
+                <button class="btn-outline">📋 Copy</button>
+              </div>`;
+              
+              entryDiv.innerHTML = html;
+              projectsBody.appendChild(entryDiv);
+            });
+          } else {
+            // No project entries - show placeholder
+            projectsHeader.textContent = `🚀 PROJECTS (0)`;
+            projectsBody.innerHTML = '<div class="empty-placeholder" style="text-align: center; color: #666; padding: 20px;">No project entries yet. Click "+ Add Project" to add one.</div>';
+          }
+        } catch (error) {
+          console.error("Error loading project entries:", error);
+          const projectsBody = document.getElementById("projects-body");
+          const projectsHeader = document.getElementById("projects-header");
+          
+          if (projectsBody) {
+            projectsBody.innerHTML = '<div class="error-placeholder" style="text-align: center; color: #d32f2f; padding: 20px;">Error loading project entries. Please try again later.</div>';
+          }
+          
+          if (projectsHeader) {
+            projectsHeader.textContent = `🚀 PROJECTS (0)`;
+          }
+        }
+      }
+      
+      // Load skill entries from API (make available globally for script.js)
+      window.loadSkillEntries = async function loadSkillEntries() {
+        try {
+          const response = await fetch("http://localhost:5000/api/skills");
+          const data = await response.json();
+          
+          const skillsBody = document.getElementById("skills-body");
+          const skillsHeader = document.getElementById("skills-header");
+          
+          if (!skillsBody || !skillsHeader) {
+            console.error("Required DOM elements not found for skills");
+            return;
+          }
+          
+          // Clear existing content
+          skillsBody.innerHTML = "";
+          
+          if (data.status === "success" && data.skills && data.skills.length > 0) {
+            const skillList = data.skills;
+            
+            // Update header with count
+            skillsHeader.textContent = `🛠️ SKILLS (${skillList.length})`;
+            
+            // Render each skill entry
+            skillList.forEach((entry) => {
+              const entryDiv = document.createElement("div");
+              entryDiv.className = "vault-entry";
+              entryDiv.setAttribute("data-id", entry._id);
+              entryDiv.setAttribute("data-type", "skill");
+              
+              // Build display HTML
+              let html = `<p style="font-weight: bold; font-size: 1.1em">${entry.name}</p>`;
+              
+              // Category and proficiency
+              const details = [];
+              if (entry.category) {
+                const categoryMap = {
+                  "programming": "Programming",
+                  "framework": "Framework",
+                  "tool": "Tool",
+                  "language": "Language",
+                  "soft-skill": "Soft Skill",
+                  "other": "Other"
+                };
+                details.push(categoryMap[entry.category] || entry.category);
+              }
+              if (entry.proficiency) {
+                const proficiencyMap = {
+                  "beginner": "Beginner",
+                  "intermediate": "Intermediate",
+                  "advanced": "Advanced",
+                  "expert": "Expert"
+                };
+                details.push(proficiencyMap[entry.proficiency] || entry.proficiency);
+              }
+              if (entry.yearsOfExperience !== undefined && entry.yearsOfExperience !== null) {
+                details.push(`${entry.yearsOfExperience} year${entry.yearsOfExperience !== 1 ? 's' : ''} experience`);
+              }
+              
+              if (details.length > 0) {
+                html += `<p style="color: #666">${details.join(" | ")}</p>`;
+              }
+              
+              // Add action buttons
+              html += `<div class="action-row">
+                <button class="btn-outline">✏️ Edit</button>
+                <button class="btn-outline">🗑️ Delete</button>
+                <button class="btn-outline">📋 Copy</button>
+              </div>`;
+              
+              entryDiv.innerHTML = html;
+              skillsBody.appendChild(entryDiv);
+            });
+          } else {
+            // No skill entries - show placeholder
+            skillsHeader.textContent = `🛠️ SKILLS (0)`;
+            skillsBody.innerHTML = '<div class="empty-placeholder" style="text-align: center; color: #666; padding: 20px;">No skill entries yet. Click "+ Add Skill" to add one.</div>';
+          }
+        } catch (error) {
+          console.error("Error loading skill entries:", error);
+          const skillsBody = document.getElementById("skills-body");
+          const skillsHeader = document.getElementById("skills-header");
+          
+          if (skillsBody) {
+            skillsBody.innerHTML = '<div class="error-placeholder" style="text-align: center; color: #d32f2f; padding: 20px;">Error loading skill entries. Please try again later.</div>';
+          }
+          
+          if (skillsHeader) {
+            skillsHeader.textContent = `🛠️ SKILLS (0)`;
+          }
+        }
+      }
+      
+      // Load award entries from API (make available globally for script.js)
+      window.loadAwardEntries = async function loadAwardEntries() {
+        try {
+          const response = await fetch("http://localhost:5000/api/awards");
+          const data = await response.json();
+          
+          const awardsBody = document.getElementById("awards-body");
+          const awardsHeader = document.getElementById("awards-header");
+          
+          if (!awardsBody || !awardsHeader) {
+            console.error("Required DOM elements not found for awards");
+            return;
+          }
+          
+          // Clear existing content
+          awardsBody.innerHTML = "";
+          
+          if (data.status === "success" && data.awards && data.awards.length > 0) {
+            const awardList = data.awards;
+            
+            // Update header with count
+            awardsHeader.textContent = `🏆 AWARDS (${awardList.length})`;
+            
+            // Render each award entry
+            awardList.forEach((entry) => {
+              const entryDiv = document.createElement("div");
+              entryDiv.className = "vault-entry";
+              entryDiv.setAttribute("data-id", entry._id);
+              entryDiv.setAttribute("data-type", "award");
+              
+              // Format date
+              const awardDate = new Date(entry.date);
+              const dateStr = awardDate.toLocaleDateString("en-US", { 
+                year: "numeric", 
+                month: "long",
+                day: "numeric"
+              });
+              
+              // Build display HTML
+              let html = `<p style="font-weight: bold; font-size: 1.1em">${entry.title}</p>`;
+              
+              // Issuer and date
+              const details = [];
+              if (entry.issuer) details.push(entry.issuer);
+              if (dateStr) details.push(dateStr);
+              
+              if (details.length > 0) {
+                html += `<p>${details.join(" | ")}</p>`;
+              }
+              
+              // Category if available
+              if (entry.category) {
+                const categoryMap = {
+                  "academic": "Academic",
+                  "professional": "Professional",
+                  "competition": "Competition",
+                  "recognition": "Recognition",
+                  "other": "Other"
+                };
+                html += `<p style="color: #666">Category: ${categoryMap[entry.category] || entry.category}</p>`;
+              }
+              
+              // Description if available
+              if (entry.description) {
+                html += `<p style="margin-top: 10px">${entry.description}</p>`;
+              }
+              
+              // Add action buttons
+              html += `<div class="action-row">
+                <button class="btn-outline">✏️ Edit</button>
+                <button class="btn-outline">🗑️ Delete</button>
+                <button class="btn-outline">📋 Copy</button>
+              </div>`;
+              
+              entryDiv.innerHTML = html;
+              awardsBody.appendChild(entryDiv);
+            });
+          } else {
+            // No award entries - show placeholder
+            awardsHeader.textContent = `🏆 AWARDS (0)`;
+            awardsBody.innerHTML = '<div class="empty-placeholder" style="text-align: center; color: #666; padding: 20px;">No award entries yet. Click "+ Add Award" to add one.</div>';
+          }
+        } catch (error) {
+          console.error("Error loading award entries:", error);
+          const awardsBody = document.getElementById("awards-body");
+          const awardsHeader = document.getElementById("awards-header");
+          
+          if (awardsBody) {
+            awardsBody.innerHTML = '<div class="error-placeholder" style="text-align: center; color: #d32f2f; padding: 20px;">Error loading award entries. Please try again later.</div>';
+          }
+          
+          if (awardsHeader) {
+            awardsHeader.textContent = `🏆 AWARDS (0)`;
+          }
+        }
+      }
+      
+      // Load all entries when page loads
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          loadEducationEntries();
+          loadExperienceEntries();
+          loadProjectEntries();
+          loadSkillEntries();
+          loadAwardEntries();
+        });
+      } else {
+        loadEducationEntries();
+        loadExperienceEntries();
+        loadProjectEntries();
+        loadSkillEntries();
+        loadAwardEntries();
+      }
+    </script>
   </body>
 </html>
