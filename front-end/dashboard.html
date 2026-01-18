@@ -82,20 +82,69 @@
       .activity-card {
         border: 1px solid black;
         padding: 15px;
-        border-radius: 10px;
+        border-radius: 0;
         background-color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+        font-family: "Courier New", Courier, monospace;
       }
 
       .activity-card .header {
         display: flex;
         align-items: center;
         gap: 10px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
+      }
+
+      .activity-card .header h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .welcome-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        margin-top: 8px;
+      }
+
+      .welcome-info {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+
+      .welcome-updated {
+        color: #999;
+        font-size: 12px;
+        margin-top: 10px;
+      }
+
+      .action-card-title-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 5px;
+      }
+
+      .action-card-icon {
+        font-size: 24px;
+      }
+
+      .action-card-title {
+        font-size: 15px;
+      }
+
+      .action-card-desc {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 12px;
       }
 
       .divider {
         margin: 10px 0;
+        border: none;
+        border-top: 1px solid black;
       }
 
       .activity-list {
@@ -116,10 +165,6 @@
         font-size: 12px;
       }
 
-      .footer {
-        margin-top: 15px;
-        text-align: right;
-      }
 
       .actions-grid {
         display: grid;
@@ -127,18 +172,64 @@
         gap: 20px;
         margin-top: 15px;
       }
+
+      .action-card-item {
+        border: 1px solid black;
+        padding: 15px;
+        background-color: white;
+      }
+
+      /* STATS GRID */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        margin-top: 15px;
+        text-align: center;
+      }
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        border: 2px solid #333;
+        background-color: #fafafa;
+      }
+
+      .stat-item-icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+
+      .stat-item-number {
+        font-size: 36px;
+        font-weight: bold;
+        color: #000;
+        margin: 5px 0;
+        line-height: 1;
+      }
+
+      .stat-item-label {
+        font-size: 14px;
+        color: #333;
+        font-weight: bold;
+        margin-top: 5px;
+      }
       a {
         color: white;
         text-decoration: none;
       }
       button {
-        margin-top: 10px;
+        margin-top: 0;
         padding: 8px 12px;
         border: none;
         background-color: #333;
         color: white;
-        border-radius: 4px;
+        border-radius: 0;
         cursor: pointer;
+        font-size: 13px;
+        font-family: "Courier New", Courier, monospace;
       }
     </style>
   </head>
@@ -168,10 +259,12 @@
       <div class="activity-card">
         <div class="header">
           <span>👋</span>
-          <h2>Welcome back Alex!</h2>
+          <h2>Welcome Back</h2>
         </div>
-        <p>Computer Science Student at University of Toronto</p>
-        <p>Last Updated: 2 days ago</p>
+        <hr class="divider" style="margin: 0 0 10px 0;" />
+        <p class="welcome-name">Alex Chen</p>
+        <p class="welcome-info">Computer Science – University of Toronto</p>
+        <p class="welcome-updated">Last updated: 2 days ago</p>
       </div>
 
       <!-- Quick Stats Card -->
@@ -180,11 +273,33 @@
           <span>📚</span>
           <h2>Identity Vault Stats</h2>
         </div>
-        <p id="stat-degrees">🎓 Degrees: <span>1</span></p>
-        <p id="stat-experiences">💼 Experiences: <span>3</span></p>
-        <p id="stat-projects">🚀 Projects: <span>5</span></p>
-        <p id="stat-skills">🛠️ Skills: <span>12</span></p>
-        <p id="stat-awards">🏆 Awards: <span>4</span></p>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-item-icon">🎓</div>
+            <div class="stat-item-number" id="stat-degrees-num">1</div>
+            <div class="stat-item-label">Degree</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-icon">💼</div>
+            <div class="stat-item-number" id="stat-experiences-num">3</div>
+            <div class="stat-item-label">Experiences</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-icon">🚀</div>
+            <div class="stat-item-number" id="stat-projects-num">5</div>
+            <div class="stat-item-label">Projects</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-icon">🛠️</div>
+            <div class="stat-item-number" id="stat-skills-num">12</div>
+            <div class="stat-item-label">Skills</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-icon">🏆</div>
+            <div class="stat-item-number" id="stat-awards-num">4</div>
+            <div class="stat-item-label">Awards</div>
+          </div>
+        </div>
       </div>
 
       <!-- Quick Actions Card -->
@@ -194,29 +309,42 @@
           <h2>Quick Actions</h2>
         </div>
         <div class="actions-grid">
-          <div>
-            <strong>📱 Social Media Assistant</strong>
-            <p>Generate posts for LinkedIn, Twitter, Instagram, and more!</p>
+          <div class="action-card-item">
+            <div class="action-card-title-row">
+              <div class="action-card-icon">📱</div>
+              <strong class="action-card-title">Social Media Assistant</strong>
+            </div>
+            <p class="action-card-desc">Generate LinkedIn, Twitter, Instagram posts.</p>
             <a href="social_media_assistant.html"
-              ><button>Go to Assistant</button></a
+              ><button>Open →</button></a
             >
           </div>
-          <div>
-            <strong>📄 Smart Resume Builder</strong>
-            <p>Create tailored resumes for job applications!</p>
+          <div class="action-card-item">
+            <div class="action-card-title-row">
+              <div class="action-card-icon">📄</div>
+              <strong class="action-card-title">Smart Resume Builder</strong>
+            </div>
+            <p class="action-card-desc">Tailored resumes for each role.</p>
             <a href="smart_resume_builder.html"
-              ><button>Build Resume</button></a
+              ><button>Build →</button></a
             >
           </div>
-          <div>
-            <strong>💼 Interview Prep</strong>
-            <p>Practice with AI interviewer and get feedback!</p>
-            <a href="interview_prep.html"><button>Start Prep</button></a>
+          <div class="action-card-item">
+            <div class="action-card-title-row">
+              <div class="action-card-icon">💼</div>
+              <strong class="action-card-title">Interview Prep</strong>
+            </div>
+            <p class="action-card-desc">AI interviewer with feedback.</p>
+            <a href="interview_prep.html"><button>Start →</button></a>
           </div>
-          <div>
-            <strong>👤 Identity Vault</strong>
-            <p>Manage your education, skills, and experiences!</p>
-            <a href="identity_vault.html"><button>Go to Vault</button></a>
+          <div class="action-card-item">
+            <div class="action-card-title-row">
+              <div class="action-card-icon">👤</div>
+              <strong class="action-card-title">Identity Vault</strong>
+            </div>
+            <p class="action-card-desc">Your canonical career data.</p>
+            <a href="identity_vault.html"><button>View →</button></a
+            >
           </div>
         </div>
       </div>
@@ -246,7 +374,6 @@
             <span class="timestamp">1w ago</span>
           </li>
         </ul>
-        <div class="footer">[View All Activity →]</div>
       </div>
     </div>
 
@@ -261,17 +388,17 @@
             const stats = data.stats;
             
             // Update dashboard stats
-            const degreesSpan = document.querySelector("#stat-degrees span");
-            const experiencesSpan = document.querySelector("#stat-experiences span");
-            const projectsSpan = document.querySelector("#stat-projects span");
-            const skillsSpan = document.querySelector("#stat-skills span");
-            const awardsSpan = document.querySelector("#stat-awards span");
+            const degreesNum = document.getElementById("stat-degrees-num");
+            const experiencesNum = document.getElementById("stat-experiences-num");
+            const projectsNum = document.getElementById("stat-projects-num");
+            const skillsNum = document.getElementById("stat-skills-num");
+            const awardsNum = document.getElementById("stat-awards-num");
             
-            if (degreesSpan) degreesSpan.textContent = stats.degrees;
-            if (experiencesSpan) experiencesSpan.textContent = stats.experiences;
-            if (projectsSpan) projectsSpan.textContent = stats.projects;
-            if (skillsSpan) skillsSpan.textContent = stats.skills;
-            if (awardsSpan) awardsSpan.textContent = stats.awards;
+            if (degreesNum) degreesNum.textContent = stats.degrees;
+            if (experiencesNum) experiencesNum.textContent = stats.experiences;
+            if (projectsNum) projectsNum.textContent = stats.projects;
+            if (skillsNum) skillsNum.textContent = stats.skills;
+            if (awardsNum) awardsNum.textContent = stats.awards;
           }
         } catch (error) {
           console.error("Error loading vault stats:", error);

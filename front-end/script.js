@@ -130,30 +130,40 @@ document.addEventListener("DOMContentLoaded", function () {
       const entry = target.closest(".vault-entry");
       if (!entry) return;
 
-      if (target.innerText.includes("🗑️ Delete")) {
+      // Only handle clicks on buttons, not on the entry itself
+      const button = target.closest("button");
+      if (!button) return;
+
+      // Check if the button is an action button (Edit, Delete, Copy)
+      const buttonText = button.innerText;
+
+      if (buttonText.includes("🗑️ Delete")) {
         if (confirm("Are you sure?")) entry.remove();
+        return;
       }
 
-      if (target.innerText.includes("📋 Copy")) {
+      if (buttonText.includes("📋 Copy")) {
         const text = entry.innerText
           .replace(/✏️ Edit|🗑️ Delete|📋 Copy/g, "")
           .trim();
         navigator.clipboard.writeText(text);
-        const original = target.innerText;
-        target.innerText = "✅";
-        setTimeout(() => (target.innerText = original), 1000);
+        const original = button.innerText;
+        button.innerText = "✅";
+        setTimeout(() => (button.innerText = original), 1000);
+        return;
       }
 
       if (
-        target.innerText.includes("✏️ Edit") ||
-        target.innerText.includes("💾 Save")
+        buttonText.includes("✏️ Edit") ||
+        buttonText.includes("💾 Save")
       ) {
         const isEditing = entry.contentEditable === "true";
         entry.contentEditable = !isEditing;
         entry.style.backgroundColor = !isEditing ? "#fffdf0" : "white";
         entry.style.outline = !isEditing ? "1px dashed black" : "none";
-        target.innerText = !isEditing ? "💾 Save" : "✏️ Edit";
+        button.innerText = !isEditing ? "💾 Save" : "✏️ Edit";
         if (!isEditing) entry.focus();
+        return;
       }
     });
 });
