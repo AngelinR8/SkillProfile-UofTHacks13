@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Resume Builder - OneProfile</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        padding-bottom: 40px;
+      }
+
+      /* HEADER / TOP BAR */
+      header {
+        background-color: #333;
+        color: white;
+        padding: 20px;
+        width: 100%;
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .search-input {
+        max-width: 300px;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .profile-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .profile-picture {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+      }
+
+      /* MAIN CONTAINER */
+      .main-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 20px;
+      }
+
+      /* PAGE TITLE */
+      .page-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 30px;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      /* INPUT CARD */
+      .input-card {
+        background: white;
+        border: 1px solid black;
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 30px;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        padding: 12px 20px;
+        border-bottom: 1px solid black;
+        font-size: 14px;
+        font-weight: bold;
+        background-color: #f9f9f9;
+      }
+
+      .card-body {
+        padding: 30px;
+      }
+
+      .input-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #555;
+      }
+
+      .job-description-textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        resize: vertical;
+        margin-bottom: 20px;
+      }
+
+      .job-description-textarea:focus {
+        outline: 2px solid #333;
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 13px;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background-color: #555;
+      }
+
+      /* RESUME PREVIEW CARD */
+      .resume-preview-card {
+        background: white;
+        border: 1px solid black;
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 30px;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      .resume-preview-card.active {
+        display: block;
+      }
+
+      .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid black;
+        background-color: #f9f9f9;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .preview-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .preview-body {
+        padding: 30px;
+      }
+
+      /* RESUME CONTENT STYLING */
+      .resume-header {
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-bottom: 25px;
+        background-color: #fafafa;
+      }
+
+      .resume-name {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+      }
+
+      .resume-contact {
+        text-align: center;
+        font-size: 12px;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      .resume-summary {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 10px;
+        line-height: 1.5;
+        color: #555;
+      }
+
+      .resume-section {
+        margin-bottom: 25px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 20px;
+      }
+
+      .resume-section:last-child {
+        border-bottom: none;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        border-bottom: 1px solid black;
+        padding-bottom: 5px;
+      }
+
+      .education-entry,
+      .experience-entry {
+        margin-bottom: 20px;
+      }
+
+      .entry-title {
+        font-weight: bold;
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+
+      .entry-org {
+        font-size: 12px;
+        margin-bottom: 3px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .entry-dates {
+        font-size: 11px;
+        color: #666;
+        margin-bottom: 8px;
+      }
+
+      .entry-bullets {
+        list-style: none;
+        padding-left: 15px;
+        margin-top: 8px;
+      }
+
+      .entry-bullets li {
+        font-size: 11px;
+        line-height: 1.6;
+        margin-bottom: 5px;
+        position: relative;
+      }
+
+      .entry-bullets li::before {
+        content: "•";
+        position: absolute;
+        left: -15px;
+        color: #333;
+      }
+
+      .skills-list {
+        list-style: none;
+        padding-left: 15px;
+      }
+
+      .skills-list li {
+        font-size: 11px;
+        line-height: 1.6;
+        margin-bottom: 5px;
+        position: relative;
+      }
+
+      .skills-list li::before {
+        content: "•";
+        position: absolute;
+        left: -15px;
+        color: #333;
+      }
+
+      /* RESUME ACTIONS */
+      .resume-actions {
+        background: white;
+        border: 1px solid black;
+        font-family: "Courier New", Courier, monospace;
+        margin-bottom: 30px;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      .resume-actions.active {
+        display: block;
+      }
+
+      .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        padding: 20px;
+      }
+
+      .action-button {
+        padding: 10px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        cursor: pointer;
+        text-align: center;
+        font-size: 12px;
+        transition: background 0.2s;
+      }
+
+      .action-button:hover {
+        background-color: #e0e0e0;
+      }
+
+      .back-button-container {
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      .copy-icon {
+        cursor: pointer;
+        font-size: 16px;
+        color: #666;
+      }
+
+      .copy-icon:hover {
+        color: #333;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="header-content">
+        <h1>OneProfile</h1>
+        <input type="text" placeholder="Search..." class="search-input" />
+        <div class="header-right">
+          <div class="profile-nav">
+            <img
+              src="https://content.presentermedia.com/files/clipart/00030000/30857/casual_guy_icon_bust_800_wht.jpg"
+              class="profile-picture"
+              alt="Profile"
+            />
+            <p>Alex</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <div class="page-title">
+        <span>📄</span>
+        <span>Smart Resume Builder</span>
+      </div>
+
+      <!-- Job Description Input Card -->
+      <div class="input-card" id="inputCard">
+        <div class="card-header">TARGET POSITION INPUT</div>
+        <div class="card-body">
+          <div class="input-label">
+            <span>🎯</span>
+            <span>Describe the job you're applying for:</span>
+          </div>
+          <textarea
+            class="job-description-textarea"
+            id="jobDescriptionInput"
+            placeholder="Company: Microsoft&#10;Position: Machine Learning Research Intern&#10;Requirements: Python, ML frameworks, research exp, NLP background preferred..."
+          ></textarea>
+          <div class="button-group">
+            <button id="generateResumeBtn">Generate Tailored Resume</button>
+            <button id="resetBtn">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resume Preview Card -->
+      <div class="resume-preview-card" id="resumePreviewCard">
+        <div class="preview-header">
+          <span>GENERATED RESUME PREVIEW</span>
+          <div class="preview-actions">
+            <span class="copy-icon" title="Copy resume">📋</span>
+          </div>
+        </div>
+        <div class="preview-body">
+          <!-- Resume Header -->
+          <div class="resume-header" id="resumeHeader">
+            <div class="resume-name">ALEX CHEN</div>
+            <div class="resume-contact">
+              Toronto, ON | alex.chen@mail.utoronto.ca |
+            </div>
+            <div class="resume-contact">
+              +1 416-555-0123 | linkedin.com/in/alexchen | github.com/alexchen
+            </div>
+            <div class="resume-summary" id="resumeSummary">
+              Computer science student specializing in ML and AI with strong
+              research and development background
+            </div>
+          </div>
+
+          <!-- Education Section -->
+          <div class="resume-section">
+            <div class="section-title">EDUCATION</div>
+            <div id="educationSection"></div>
+          </div>
+
+          <!-- Experience Section -->
+          <div class="resume-section">
+            <div class="section-title">EXPERIENCE</div>
+            <div id="experienceSection"></div>
+          </div>
+
+          <!-- Skills Section -->
+          <div class="resume-section">
+            <div class="section-title">SKILLS</div>
+            <ul class="skills-list" id="skillsSection"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resume Actions -->
+      <div class="resume-actions" id="resumeActions">
+        <div class="card-header">RESUME ACTIONS</div>
+        <div class="actions-grid">
+          <div class="action-button" id="downloadPdfBtn">⬇️ Download PDF</div>
+          <div class="action-button" id="downloadDocxBtn">⬇️ Download DOCX</div>
+          <div class="action-button" id="copyToClipBtn">📄 Copy to Clip</div>
+          <div class="action-button" id="editManuallyBtn">📝 Edit Manually</div>
+          <div class="action-button" id="regenerateBtn">🔄 Regenerate</div>
+          <div class="action-button" id="saveVersionBtn">💾 Save Version</div>
+        </div>
+      </div>
+
+      <div class="back-button-container">
+        <button onclick="location.href = 'dashboard.html'">
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Sample data from Identity Vault (in real implementation, this would come from API)
+      const userProfile = {
+        name: "Alex Chen",
+        email: "alex.chen@mail.utoronto.ca",
+        phone: "+1 416-555-0123",
+        location: "Toronto, ON",
+        linkedin: "linkedin.com/in/alexchen",
+        github: "github.com/alexchen",
+        summary:
+          "Computer science student specializing in ML and AI with strong research and development background",
+      };
+
+      const educationData = [
+        {
+          degree: "Honours BSc in Computer Science & Statistics",
+          university: "University of Toronto",
+          dates: "SEPTEMBER 2024 - PRESENT",
+          gpa: "GPA 3.9",
+          bullets: [
+            "Strong foundation in ML algorithms, probability, and optimization for AI applications",
+            "Trained in statistical modeling and data analysis through intensive CS coursework",
+            "High academic standing demonstrating analytical strength and fast learning ability",
+          ],
+        },
+      ];
+
+      const experienceData = [
+        {
+          title: "Algorithm Engineering Internship",
+          org: "Realai",
+          location: "Beijing, CN",
+          dates: "2025 SUMMER",
+          bullets: [
+            "Developed time-series forecasting models for financial data analysis",
+            "Optimized ML algorithms reducing processing time by 30%",
+            "Collaborated with research team on neural network architecture design",
+          ],
+        },
+        {
+          title: "Time Series Research - Alzheimer's Forecasting",
+          org: "Path Academic",
+          location: "Beijing, CN",
+          dates: "2023 - 2024",
+          bullets: [
+            "Built predictive models using LSTM and ARIMA for disease progression",
+            "Published research findings in peer-reviewed academic journal",
+            "Analyzed large-scale medical datasets with 95% accuracy rate",
+          ],
+        },
+        {
+          title: "LLM-Based Interactive System - AI Startup Project",
+          org: "TsingHua University",
+          location: "",
+          dates: "2023 - 2024",
+          bullets: [
+            "Designed conversational AI system using transformer architectures",
+            "Integrated NLP pipelines for real-time text processing",
+            "Deployed system serving 1000+ daily active users",
+          ],
+        },
+      ];
+
+      const skillsData = [
+        "Programming for ML experimentation with OOP and structured design",
+        "Algorithms and data structures for full-stack development",
+        "Machine learning workflows: preprocessing, time-series modeling, model comparison",
+      ];
+
+      // DOM Elements
+      const inputCard = document.getElementById("inputCard");
+      const jobDescriptionInput = document.getElementById("jobDescriptionInput");
+      const generateResumeBtn = document.getElementById("generateResumeBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const resumePreviewCard = document.getElementById("resumePreviewCard");
+      const resumeActions = document.getElementById("resumeActions");
+      const educationSection = document.getElementById("educationSection");
+      const experienceSection = document.getElementById("experienceSection");
+      const skillsSection = document.getElementById("skillsSection");
+      const resumeSummary = document.getElementById("resumeSummary");
+
+      // Generate tailored resume based on job description
+      function generateResume() {
+        const jobDescription = jobDescriptionInput.value.trim();
+        if (!jobDescription) {
+          alert("Please enter a job description before generating the resume.");
+          return;
+        }
+
+        // In real implementation, this would call the AI API to tailor the resume
+        // For now, we'll display the resume with sample data
+        displayResume();
+
+        // Show preview and actions
+        resumePreviewCard.classList.add("active");
+        resumeActions.classList.add("active");
+      }
+
+      // Display resume content
+      function displayResume() {
+        // Update summary based on job (in real app, AI would customize this)
+        const jobDescription = jobDescriptionInput.value.toLowerCase();
+        if (jobDescription.includes("machine learning") || jobDescription.includes("ml")) {
+          resumeSummary.textContent =
+            "Computer science student specializing in ML and AI with strong research and development background";
+        } else if (jobDescription.includes("software engineering") || jobDescription.includes("backend")) {
+          resumeSummary.textContent =
+            "Experienced software engineer with expertise in full-stack development and distributed systems";
+        } else {
+          resumeSummary.textContent = userProfile.summary;
+        }
+
+        // Display Education
+        educationSection.innerHTML = "";
+        educationData.forEach((edu) => {
+          const eduDiv = document.createElement("div");
+          eduDiv.className = "education-entry";
+          eduDiv.innerHTML = `
+            <div class="entry-title">${edu.degree}</div>
+            <div class="entry-org">
+              <span>${edu.university}</span>
+              <span>${edu.gpa}</span>
+            </div>
+            <div class="entry-dates">${edu.dates}</div>
+            <ul class="entry-bullets">
+              ${edu.bullets.map((bullet) => `<li>${bullet}</li>`).join("")}
+            </ul>
+          `;
+          educationSection.appendChild(eduDiv);
+        });
+
+        // Display Experience (show top 3 most relevant)
+        experienceSection.innerHTML = "";
+        const displayedExperiences = experienceData.slice(0, 3);
+        displayedExperiences.forEach((exp) => {
+          const expDiv = document.createElement("div");
+          expDiv.className = "experience-entry";
+          const locationText = exp.location ? ` | ${exp.location}` : "";
+          expDiv.innerHTML = `
+            <div class="entry-title">${exp.title}</div>
+            <div class="entry-org">
+              <span>${exp.org}${locationText}</span>
+            </div>
+            <div class="entry-dates">${exp.dates}</div>
+            <ul class="entry-bullets">
+              ${exp.bullets.map((bullet) => `<li>${bullet}</li>`).join("")}
+            </ul>
+          `;
+          experienceSection.appendChild(expDiv);
+        });
+
+        // Display Skills
+        skillsSection.innerHTML = "";
+        skillsData.forEach((skill) => {
+          const li = document.createElement("li");
+          li.textContent = skill;
+          skillsSection.appendChild(li);
+        });
+      }
+
+      // Reset form
+      function resetForm() {
+        jobDescriptionInput.value = "";
+        resumePreviewCard.classList.remove("active");
+        resumeActions.classList.remove("active");
+        jobDescriptionInput.focus();
+      }
+
+      // Copy resume to clipboard
+      function copyResumeToClipboard() {
+        const resumeText = `
+${userProfile.name}
+${userProfile.location} | ${userProfile.email} | ${userProfile.phone}
+${userProfile.linkedin} | ${userProfile.github}
+${resumeSummary.textContent}
+
+EDUCATION
+${educationData
+  .map(
+    (edu) => `${edu.degree}
+${edu.university} | ${edu.gpa}
+${edu.dates}
+${edu.bullets.map((b) => `• ${b}`).join("\n")}`
+  )
+  .join("\n\n")}
+
+EXPERIENCE
+${experienceData
+  .slice(0, 3)
+  .map(
+    (exp) => `${exp.title}
+${exp.org}${exp.location ? ` | ${exp.location}` : ""}
+${exp.dates}
+${exp.bullets.map((b) => `• ${b}`).join("\n")}`
+  )
+  .join("\n\n")}
+
+SKILLS
+${skillsData.map((skill) => `• ${skill}`).join("\n")}
+        `.trim();
+
+        navigator.clipboard.writeText(resumeText).then(() => {
+          const copyIcon = document.querySelector(".copy-icon");
+          const original = copyIcon.textContent;
+          copyIcon.textContent = "✓";
+          setTimeout(() => {
+            copyIcon.textContent = original;
+          }, 1000);
+          alert("Resume copied to clipboard!");
+        });
+      }
+
+      // Action handlers
+      function handleAction(action) {
+        switch (action) {
+          case "downloadPdf":
+            alert("PDF download functionality will be implemented with backend API.");
+            break;
+          case "downloadDocx":
+            alert("DOCX download functionality will be implemented with backend API.");
+            break;
+          case "copyToClip":
+            copyResumeToClipboard();
+            break;
+          case "editManually":
+            alert("Manual editing functionality will be implemented.");
+            break;
+          case "regenerate":
+            generateResume();
+            break;
+          case "saveVersion":
+            alert("Resume version saved!");
+            break;
+        }
+      }
+
+      // Event listeners
+      generateResumeBtn.addEventListener("click", generateResume);
+      resetBtn.addEventListener("click", resetForm);
+
+      document.getElementById("downloadPdfBtn").addEventListener("click", () => handleAction("downloadPdf"));
+      document.getElementById("downloadDocxBtn").addEventListener("click", () => handleAction("downloadDocx"));
+      document.getElementById("copyToClipBtn").addEventListener("click", () => handleAction("copyToClip"));
+      document.getElementById("editManuallyBtn").addEventListener("click", () => handleAction("editManually"));
+      document.getElementById("regenerateBtn").addEventListener("click", () => handleAction("regenerate"));
+      document.getElementById("saveVersionBtn").addEventListener("click", () => handleAction("saveVersion"));
+
+      // Copy icon click
+      document.querySelector(".copy-icon").addEventListener("click", copyResumeToClipboard);
+
+      // Allow Enter key in textarea (Shift+Enter for new line, Enter submits)
+      jobDescriptionInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.shiftKey === false && e.ctrlKey === true) {
+          e.preventDefault();
+          generateResume();
+        }
+      });
+    </script>
+  </body>
+</html>
